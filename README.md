@@ -26,6 +26,12 @@ logger.warn('some fixed string', { some: 'meta object' });
 logger.error('some fixed string', { some: 'meta object' });
 ```
 
+## Alternatives
+
+**Warning:** This a logger for testing! Not a default logger.
+
+If you want to add a default logger to your `dependencies` 
+  then I strongly recommend you use [`null-logtron`][null-logtron]
 ## Motivation
 
 You want to instrument your application and your libraries
@@ -69,3 +75,4 @@ This works great together with `itape --trace` where you can
   [dep]: https://david-dm.org/Raynos/debug-logtron
   [npm-png]: https://nodei.co/npm/debug-logtron.png?stars&downloads
   [npm]: https://nodei.co/npm/debug-logtron
+  [null-logtron]: https://github.com/Raynos/null-logtron
