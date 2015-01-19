@@ -12,23 +12,38 @@ A debug logger with a logtron interface.
 
 ## Example
 
-```js
-var debugLogtron = require("debug-logtron");
+This logger does nothing unless you start the process with
+  `NODE_DEBUG=mylibrary`.
 
-// TODO. Show example
+```js
+var DebugLogtron = require("debug-logtron");
+
+var logger = DebugLogtron('mylibrary');
+
+logger.debug('some fixed string', { some: 'meta object' });
+logger.info('some fixed string', { some: 'meta object' });
+logger.warn('some fixed string', { some: 'meta object' });
+logger.error('some fixed string', { some: 'meta object' });
 ```
+
+## Motivation
+
+You want to instrument your application and your libraries
+  with a production application logger. A logger that writes
+  somewhere in production.
+
+However for your writing tests for both your libraries and
+  your applications you probably do not want to see all of your
+  logs spewing on STDOUT by default.
+
+This is where `debug-logtron` comes in, You can start your app
+  or libraries with the debug logger in your tests which allows
+  the test runner to decide when to spew.
+
+This works great together with `itape --trace` where you can
+  use `itape` to turn on and off trace mode.
 
 ## Docs
-
-### `var someValue = debugLogtron(/*arguments*/)`
-
-<!--
-  This is a jsig notation of your interface.
-  https://github.com/Raynos/jsig
--->
-```ocaml
-debug-logtron := (arg: Any) => void
-```
 
 // TODO. State what the module does.
 
