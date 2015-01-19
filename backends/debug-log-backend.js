@@ -1,17 +1,20 @@
 'use strict';
 
 var Writable = require('readable-stream/writable');
-var debuglog = require('debuglog');
+var globalDebuglog = require('debuglog');
 var inspect = require('util/').inspect;
 
 module.exports = DebugLogBackend;
 
-function DebugLogBackend(namespace) {
+function DebugLogBackend(namespace, opts) {
     if (!(this instanceof DebugLogBackend)) {
-        return new DebugLogBackend(namespace);
+        return new DebugLogBackend(namespace, opts);
     }
 
-    this.debuglog = debuglog(namespace);
+    var debuglog = opts.debuglog ||
+        /*istanbul ignore next */ globalDebuglog;
+
+    this.log = debuglog(namespace);
 }
 
 var proto = DebugLogBackend.prototype;
@@ -27,11 +30,11 @@ proto.createStream = function createStream() {
     return stream;
 
     function write(logRecord, enc, cb) {
-        var msg = logRecord.levelName + ' ' +
-            logRecord.fields.msg + ' ' +
-            inspect(logRecord.fields.meta);
+        var msg = logRecord.levelName + ': ' +
+            logRecord.fields.msg + ' ~ ' +
+            inspect(logRecord.meta);
 
-        self.debuglog(msg);
+        self.log(msg);
         cb();
     }
 };

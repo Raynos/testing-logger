@@ -7,33 +7,35 @@ var Buffer = require('buffer').Buffer;
 var CircularJSON = require('circular-json');
 var extend = require('xtend');
 
-var LEVELS = require('./levels.js');
+var LEVELS = require('./levels.js').LEVELS_BY_VALUE;
 
-LogRecord.isValid = isValid;
-LogRecord.JSONLogRecord = JSONLogRecord;
+LogMessage.isValid = isValid;
+LogMessage.JSONLogRecord = JSONLogRecord;
 
-module.exports = LogRecord;
+module.exports = LogMessage;
 
-function LogRecord(level, msg, meta) {
-    if (!(this instanceof LogRecord)) {
-        return new LogRecord(level, msg, meta);
+function LogMessage(level, msg, meta, time) {
+    if (!(this instanceof LogMessage)) {
+        return new LogMessage(level, msg, meta);
     }
 
     this.level = level;
+    this.levelName = LEVELS[level];
     this.msg = msg;
 
     this.meta = (meta === null || meta === void 0) ? null : meta;
 
+    this._time = time;
     this._jsonLogRecord = null;
     this._buffer = null;
 }
 
-var proto = LogRecord.prototype;
+var proto = LogMessage.prototype;
 
 proto.toLogRecord = function toBuffer() {
     if (!this._jsonLogRecord) {
         this._jsonLogRecord = new JSONLogRecord(
-            this.level, this.msg, this.meta);
+            this.level, this.msg, this.meta, this._time);
     }
 
     return this._jsonLogRecord;
@@ -51,9 +53,9 @@ proto.toBuffer = function toBuffer() {
 };
 
 /* JSONLogRecord. The same interface as bunyan on the wire */
-function JSONLogRecord(level, msg, meta) {
+function JSONLogRecord(level, msg, meta, time) {
     if (!(this instanceof JSONLogRecord)) {
-        return new JSONLogRecord(level, msg, meta);
+        return new JSONLogRecord(level, msg, meta, time);
     }
 
     this.fields = extend(meta, {
@@ -63,7 +65,7 @@ function JSONLogRecord(level, msg, meta) {
         component: null,
         level: level,
         msg: msg,
-        time: (new Date()).toISOString(),
+        time: time || (new Date()).toISOString(),
         src: null,
         v: 0
     });

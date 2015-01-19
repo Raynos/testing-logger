@@ -2,11 +2,11 @@
 
 var TypedError = require('error/typed');
 
-var LogRecord = require('./log-record.js');
+var LogMessage = require('./log-message.js');
 var DebugLogBackend = require('./backends/debug-log-backend.js');
-var LEVELS = require('./levels.js');
+var LEVELS = require('./levels.js').LEVELS_BY_NAME;
 
-var validNamespaceRegex = /[a-zA-Z0-9]+/;
+var validNamespaceRegex = /^[a-zA-Z0-9]+$/;
 var InvalidNamespaceError = TypedError({
     type: 'debug-logtron.invalid-argument.namespace',
     message: 'Unexpected characters in the `namespace` arg.\n' +
@@ -20,9 +20,9 @@ var InvalidNamespaceError = TypedError({
 
 module.exports = DebugLogtron;
 
-function DebugLogtron(namespace) {
+function DebugLogtron(namespace, opts) {
     if (!(this instanceof DebugLogtron)) {
-        return new DebugLogtron(namespace);
+        return new DebugLogtron(namespace, opts);
     }
 
     var isValid = validNamespaceRegex.test(namespace);
@@ -32,27 +32,33 @@ function DebugLogtron(namespace) {
 
         throw InvalidNamespaceError({
             namespace: namespace,
-            badChar: hasHypen ? '-' : hasSpace ? ' ' : 'bad',
+            badChar: hasHypen ? '-' : hasSpace ? 'space' : 'bad',
             reason: hasHypen ? 'hypen' :
                 hasSpace ? 'space' : 'unknown'
         });
     }
 
+    opts = opts || {};
+
     this.name = namespace;
 
-    this._backend = DebugLogBackend(namespace);
+    this._backend = DebugLogBackend(namespace, opts);
     this._stream = this._backend.createStream();
 }
 
 var proto = DebugLogtron.prototype;
 
 proto._log = function _log(level, msg, meta, cb) {
-    var logRecord = new LogRecord(level, msg, meta);
-    LogRecord.isValid(logRecord);
+    var logMessage = new LogMessage(level, msg, meta);
+    LogMessage.isValid(logMessage);
 
-    logRecord.name = this.name;
+    logMessage.name = this.name;
 
-    this._stream.write(logRecord);
+    this._stream.write(logMessage.toLogRecord(), cb);
+};
+
+proto.trace = function trace(msg, meta, cb) {
+    this._log(LEVELS.trace, msg, meta, cb);
 };
 
 proto.debug = function debug(msg, meta, cb) {
