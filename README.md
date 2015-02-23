@@ -26,6 +26,13 @@ logger.warn('some fixed string', { some: 'meta object' });
 logger.error('some fixed string', { some: 'meta object' });
 ```
 
+`debug-logtron` will internally use [`debuglog`][debuglog] to
+write your logs.
+
+This means its silent by default unless you start the process
+with the `NODE_DEBUG` environment variable. If you set
+`NODE_DEBUG=mylibrary` it will write to stderr.
+
 ## Alternatives
 
 **Warning:** This a logger for testing! Not a default logger.
@@ -76,3 +83,4 @@ This works great together with `itape --trace` where you can
   [npm-png]: https://nodei.co/npm/debug-logtron.png?stars&downloads
   [npm]: https://nodei.co/npm/debug-logtron
   [null-logtron]: https://github.com/Raynos/null-logtron
+  [debuglog]: https://github.com/sam-github/node-debuglog
