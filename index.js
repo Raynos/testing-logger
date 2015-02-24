@@ -69,6 +69,10 @@ proto.info = function info(msg, meta, cb) {
     this._log(LEVELS.info, msg, meta, cb);
 };
 
+proto.access = function access(msg, meta, cb) {
+    this._log(LEVELS.access, msg, meta, cb);
+};
+
 proto.warn = function warn(msg, meta, cb) {
     this._log(LEVELS.warn, msg, meta, cb);
 };

@@ -56,11 +56,12 @@ test('logger levels', function t(assert) {
     logger.trace('trace');
     logger.debug('debug');
     logger.info('info');
+    logger.access('access');
     logger.warn('warn');
     logger.error('error');
     logger.fatal('fatal');
 
-    assert.equal(logger.lines.length, 6);
+    assert.equal(logger.lines.length, 7);
 
     var line = logger.lines[0];
     assert.equal(line.namespace, 'debuglogtron');
@@ -76,15 +77,19 @@ test('logger levels', function t(assert) {
 
     var line4 = logger.lines[3];
     assert.equal(line4.namespace, 'debuglogtron');
-    assert.equal(line4.msg, 'warn: warn ~ null');
+    assert.equal(line4.msg, 'access: access ~ null');
 
     var line5 = logger.lines[4];
     assert.equal(line5.namespace, 'debuglogtron');
-    assert.equal(line5.msg, 'error: error ~ null');
+    assert.equal(line5.msg, 'warn: warn ~ null');
 
     var line6 = logger.lines[5];
     assert.equal(line6.namespace, 'debuglogtron');
-    assert.equal(line6.msg, 'fatal: fatal ~ null');
+    assert.equal(line6.msg, 'error: error ~ null');
+
+    var line7 = logger.lines[6];
+    assert.equal(line7.namespace, 'debuglogtron');
+    assert.equal(line7.msg, 'fatal: fatal ~ null');
 
     assert.end();
 });
