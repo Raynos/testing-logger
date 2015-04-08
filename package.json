@@ -1,6 +1,6 @@
 {
   "name": "debug-logtron",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "A debug logger with a logtron interface.",
   "keywords": [],
   "author": "Raynos <raynos2@gmail.com>",
