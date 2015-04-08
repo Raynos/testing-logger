@@ -27,6 +27,23 @@ test('can create logger', function t(assert) {
     assert.end();
 });
 
+test('can log async', function t(assert) {
+    var logger = allocLogger();
+
+    logger.debug('oh hi', {}, onLogged);
+
+    function onLogged(err) {
+        assert.ifError(err);
+        assert.equal(logger.lines.length, 1);
+
+        var line = logger.lines[0];
+        assert.equal(line.namespace, 'debuglogtron');
+        assert.equal(line.msg, 'debug: oh hi ~ {}');
+
+        assert.end();
+    }
+});
+
 test('logger throws with bad namespace', function t(assert) {
     assert.throws(function throwIt() {
         DebugLogtron('bad name');

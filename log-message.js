@@ -1,10 +1,9 @@
 'use strict';
 
-var assert = require('assert/');
+var assert = require('assert');
 var process = require('process/');
 var os = require('os');
 var Buffer = require('buffer').Buffer;
-var CircularJSON = require('circular-json');
 var extend = require('xtend');
 
 var LEVELS = require('./levels.js').LEVELS_BY_VALUE;
@@ -45,7 +44,7 @@ proto.toBuffer = function toBuffer() {
     if (!this._buffer) {
         var logRecord = this.toLogRecord();
 
-        var jsonStr = CircularJSON.stringify(logRecord.fields);
+        var jsonStr = JSON.stringify(logRecord.fields);
         this._buffer = new Buffer(jsonStr);
     }
 

@@ -1,8 +1,7 @@
 'use strict';
 
-var Writable = require('readable-stream/writable');
 var globalDebuglog = require('debuglog');
-var inspect = require('util/').inspect;
+var inspect = require('util').inspect;
 
 module.exports = DebugLogBackend;
 
@@ -21,20 +20,22 @@ var proto = DebugLogBackend.prototype;
 
 proto.createStream = function createStream() {
     var self = this;
-    var stream = new Writable({
-        objectMode: true
-    });
 
-    stream._write = write;
+    var stream = {
+        write: write
+    };
 
     return stream;
 
-    function write(logRecord, enc, cb) {
+    function write(logRecord, cb) {
         var msg = logRecord.levelName + ': ' +
             logRecord.fields.msg + ' ~ ' +
             inspect(logRecord.meta);
 
         self.log(msg);
-        cb();
+
+        if (cb) {
+            cb();
+        }
     }
 };
