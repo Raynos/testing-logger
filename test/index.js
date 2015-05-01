@@ -76,10 +76,8 @@ test('logger levels', function t(assert) {
     logger.info('info');
     logger.access('access');
     logger.warn('warn');
-    logger.error('error');
-    logger.fatal('fatal');
 
-    assert.equal(logger.lines.length, 7);
+    assert.equal(logger.lines.length, 5);
 
     var line = logger.lines[0];
     assert.ok(line.msg.indexOf('TRACE: trace ~ null') >= 0);
@@ -95,6 +93,13 @@ test('logger levels', function t(assert) {
 
     var line5 = logger.lines[4];
     assert.ok(line5.msg.indexOf('WARN: warn ~ null') >= 0);
+
+    assert.throws(function throwIt() {
+        logger.error('error');
+    }, 'error');
+    assert.throws(function throwIt() {
+        logger.fatal('fatal');
+    }, 'fatal');
 
     var line6 = logger.lines[5];
     assert.ok(line6.msg.indexOf('ERROR: error ~ null') >= 0);
@@ -219,7 +224,9 @@ test('always prints error/fatal', function t(assert) {
         }
     });
 
-    logger.error('hi');
+    assert.throws(function throwIt() {
+        logger.error('hi');
+    }, 'hi');
     assert.equal(lines.length, 1);
     var line = lines[0];
     assert.ok(line.indexOf('ERROR: hi ~ null') >= 0);
@@ -280,7 +287,9 @@ test('prints debug/access/trace if NODE_DEBUG verbose', function t(assert) {
     assert.equal(lines.length, 2);
     assert.ok(lines[1].indexOf('INFO: hi ~ null') >= 0);
 
-    logger.error('hi');
+    assert.throws(function throwIt() {
+        logger.error('hi');
+    }, 'hi');
 
     assert.equal(lines.length, 3);
     assert.ok(lines[2].indexOf('ERROR: hi ~ null') >= 0);

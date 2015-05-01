@@ -15,12 +15,6 @@ var COLOR_MAP = {
     trace: 'bgCyan'
 };
 
-/* Three steps
-
-    - add verbose mode; default is WARN + ERROR; verbose === all
-    - make error & fatal throw
-
-*/
 module.exports = DebugLogBackend;
 
 function DebugLogBackend(namespace, opts) {
@@ -91,6 +85,10 @@ DebugLogStream.prototype.write = function write(logRecord, cb) {
     ) {
         var msg = self.formatMessage(logRecord);
         self.console.error(msg);
+    }
+
+    if (levelName === 'fatal' || levelName === 'error') {
+        throw new Error(logRecord.fields.msg);
     }
 
     if (cb) {
