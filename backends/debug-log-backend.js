@@ -21,7 +21,6 @@ var COLOR_MAP = {
     - make error & fatal throw
 
 */
-
 module.exports = DebugLogBackend;
 
 function DebugLogBackend(namespace, opts) {
@@ -40,8 +39,16 @@ function DebugLogBackend(namespace, opts) {
 
     var debugEnviron = self.env.NODE_DEBUG || '';
     var regex = new RegExp('\\b' + self.namespace + '\\b', 'i');
+    var verboseRegex = new RegExp(
+        '\\b' + self.namespace + 'verbose\\b', 'i'
+    );
 
     self.enabled = regex.test(debugEnviron);
+    self.verbose = verboseRegex.test(debugEnviron);
+
+    if (self.verbose) {
+        self.enabled = true;
+    }
 }
 
 DebugLogBackend.prototype.createStream = function createStream() {
@@ -49,7 +56,9 @@ DebugLogBackend.prototype.createStream = function createStream() {
 
     return DebugLogStream(self.namespace, {
         console: self.console,
-        colors: self.colors
+        colors: self.colors,
+        enabled: self.enabled,
+        verbose: self.verbose
     });
 };
 
@@ -63,13 +72,26 @@ function DebugLogStream(namespace, opts) {
     self.namespace = namespace;
     self.console = opts.console;
     self.colors = opts.colors;
+    self.enabled = opts.enabled;
+    self.verbose = opts.verbose;
 }
 
 DebugLogStream.prototype.write = function write(logRecord, cb) {
     var self = this;
 
-    var msg = self.formatMessage(logRecord);
-    self.console.error(msg);
+    var levelName = logRecord.levelName;
+
+    if (
+        (levelName === 'fatal' || levelName === 'error') ||
+        (self.enabled &&
+            (levelName === 'warn' || levelName === 'info')) ||
+        (self.verbose &&
+            (levelName === 'access' || levelName === 'debug' ||
+                levelName === 'trace'))
+    ) {
+        var msg = self.formatMessage(logRecord);
+        self.console.error(msg);
+    }
 
     if (cb) {
         cb();

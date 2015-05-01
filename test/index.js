@@ -209,11 +209,91 @@ test('logger respects color option', function t(assert) {
     assert.end();
 });
 
+test('always prints error/fatal', function t(assert) {
+    var lines = [];
+    var logger = DebugLogtron('wat', {
+        console: {
+            error: function log(x) {
+                lines.push(x);
+            }
+        }
+    });
+
+    logger.error('hi');
+    assert.equal(lines.length, 1);
+    var line = lines[0];
+    assert.ok(line.indexOf('ERROR: hi ~ null') >= 0);
+
+    lines = [];
+    logger.info('lul');
+    assert.equal(lines.length, 0);
+
+    assert.end();
+});
+
+test('prints warn/info if NODE_DEBUG', function t(assert) {
+    var lines = [];
+    var logger = DebugLogtron('wat', {
+        console: {
+            error: function log(x) {
+                lines.push(x);
+            }
+        },
+        env: {
+            NODE_DEBUG: 'wat'
+        }
+    });
+
+    logger.info('hi');
+    assert.equal(lines.length, 1);
+
+    assert.ok(lines[0].indexOf('INFO: hi ~ null') >= 0);
+
+    lines = [];
+    logger.debug('roflcopter');
+
+    assert.equal(lines.length, 0);
+
+    assert.end();
+});
+
+test('prints debug/access/trace if NODE_DEBUG verbose', function t(assert) {
+    var lines = [];
+    var logger = DebugLogtron('wat', {
+        console: {
+            error: function log(x) {
+                lines.push(x);
+            }
+        },
+        env: {
+            NODE_DEBUG: 'watverbose'
+        }
+    });
+
+    logger.debug('hi');
+    assert.equal(lines.length, 1);
+
+    assert.ok(lines[0].indexOf('DEBUG: hi ~ null') >= 0);
+
+    logger.info('hi');
+
+    assert.equal(lines.length, 2);
+    assert.ok(lines[1].indexOf('INFO: hi ~ null') >= 0);
+
+    logger.error('hi');
+
+    assert.equal(lines.length, 3);
+    assert.ok(lines[2].indexOf('ERROR: hi ~ null') >= 0);
+
+    assert.end();
+});
+
 function allocLogger(opts) {
     opts = opts || {};
     var logger = DebugLogtron('debuglogtrontestcode', {
         env: {
-            NODE_DEBUG: 'debuglogtrontestcode'
+            NODE_DEBUG: 'debuglogtrontestcode ' +
+                'debuglogtrontestcodeverbose'
         },
         console: {
             error: function logStatement(msg) {
