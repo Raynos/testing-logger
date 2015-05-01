@@ -4,6 +4,8 @@ var test = require('tape');
 var process = require('process/');
 var os = require('os');
 
+require('chalk').enabled = false;
+
 var DebugLogtron = require('../index.js');
 var LogMessage = require('../log-message.js');
 var JSONLogRecord = LogMessage.JSONLogRecord;
@@ -21,7 +23,7 @@ test('can create logger', function t(assert) {
     assert.equal(logger.lines.length, 1);
 
     var line = logger.lines[0];
-    assert.ok(line.msg.indexOf('debug: hi ~ null') >= 0);
+    assert.ok(line.msg.indexOf('DEBUG: hi ~ null') >= 0);
 
     assert.end();
 });
@@ -36,7 +38,7 @@ test('can log async', function t(assert) {
         assert.equal(logger.lines.length, 1);
 
         var line = logger.lines[0];
-        assert.ok(line.msg.indexOf('debug: oh hi ~ {}') >= 0);
+        assert.ok(line.msg.indexOf('DEBUG: oh hi ~ {}') >= 0);
 
         assert.end();
     }
@@ -79,25 +81,25 @@ test('logger levels', function t(assert) {
     assert.equal(logger.lines.length, 7);
 
     var line = logger.lines[0];
-    assert.ok(line.msg.indexOf('trace: trace ~ null') >= 0);
+    assert.ok(line.msg.indexOf('TRACE: trace ~ null') >= 0);
 
     var line2 = logger.lines[1];
-    assert.ok(line2.msg.indexOf('debug: debug ~ null') >= 0);
+    assert.ok(line2.msg.indexOf('DEBUG: debug ~ null') >= 0);
 
     var line3 = logger.lines[2];
-    assert.ok(line3.msg.indexOf('info: info ~ null') >= 0);
+    assert.ok(line3.msg.indexOf('INFO: info ~ null') >= 0);
 
     var line4 = logger.lines[3];
-    assert.ok(line4.msg.indexOf('access: access ~ null') >= 0);
+    assert.ok(line4.msg.indexOf('ACCESS: access ~ null') >= 0);
 
     var line5 = logger.lines[4];
-    assert.ok(line5.msg.indexOf('warn: warn ~ null') >= 0);
+    assert.ok(line5.msg.indexOf('WARN: warn ~ null') >= 0);
 
     var line6 = logger.lines[5];
-    assert.ok(line6.msg.indexOf('error: error ~ null') >= 0);
+    assert.ok(line6.msg.indexOf('ERROR: error ~ null') >= 0);
 
     var line7 = logger.lines[6];
-    assert.ok(line7.msg.indexOf('fatal: fatal ~ null') >= 0);
+    assert.ok(line7.msg.indexOf('FATAL: fatal ~ null') >= 0);
 
     assert.end();
 });
@@ -124,7 +126,7 @@ test('serialize meta', function t(assert) {
     assert.equal(logger.lines.length, 1);
     var line = logger.lines[0];
 
-    assert.ok(line.msg.indexOf('info: hello ~ ' +
+    assert.ok(line.msg.indexOf('INFO: hello ~ ' +
         '{ complex: { nested: true, foo: \'bar\' } }') >= 0);
 
     assert.end();

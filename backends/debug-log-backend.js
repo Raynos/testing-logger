@@ -3,11 +3,27 @@
 var inspect = require('util').inspect;
 var process = require('process');
 var globalConsole = require('console');
+var chalk = require('chalk');
+
+var COLOR_MAP = {
+    fatal: 'bgRed',
+    error: 'bgRed',
+    warn: 'bgYellow',
+    access: 'bgGreen',
+    info: 'bgGreen',
+    debug: 'bgBlue',
+    trace: 'bgCyan'
+};
 
 /* Three steps
 
-    - inline debuglog
-    - add colors
+    - add colors {
+        fatal: bgRed,
+        error: red,
+        warn: yellow,
+        info: green,
+        debug: blue
+    }
     - add verbose mode; default is WARN + ERROR; verbose === all
 
 */
@@ -67,8 +83,13 @@ function formatMessage(logRecord) {
     var self = this;
     var pid = process.pid;
 
-    return self.namespace + ' ' + pid + ': ' +
-        logRecord.levelName + ': ' +
-        logRecord.fields.msg + ' ~ ' +
+    var color = COLOR_MAP[logRecord.levelName];
+
+    var prefix = self.namespace + ' ' + pid + ': ' +
+        logRecord.levelName.toUpperCase();
+    prefix = chalk[color](prefix);
+    prefix = chalk.bold(prefix);
+
+    return prefix + ': ' + logRecord.fields.msg + ' ~ ' +
         inspect(logRecord.meta);
 };

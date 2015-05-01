@@ -17,6 +17,7 @@
     }
   ],
   "dependencies": {
+    "chalk": "1.0.0",
     "debuglog": "^1.0.1",
     "error": "^5.0.0",
     "process": "^0.10.0",
