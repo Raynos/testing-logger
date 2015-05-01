@@ -3,8 +3,9 @@
 var test = require('tape');
 var process = require('process/');
 var os = require('os');
+var chalk = require('chalk');
 
-require('chalk').enabled = false;
+chalk.enabled = false;
 
 var DebugLogtron = require('../index.js');
 var LogMessage = require('../log-message.js');
@@ -184,7 +185,32 @@ test('LogMessage to buffer', function t(assert) {
     assert.end();
 });
 
-function allocLogger() {
+test('logger respects color option', function t(assert) {
+    chalk.enabled = true;
+    var logger1 = allocLogger({
+        colors: false
+    });
+    var logger2 = allocLogger({
+        colors: true
+    });
+
+    logger1.info('hi');
+    logger2.info('hi');
+
+    var line1 = logger1.lines[0].msg;
+    assert.ok(line1.indexOf('INFO: hi ~ null') >= 0);
+
+    var line2 = logger2.lines[0].msg;
+    assert.ok(
+        line2.indexOf('INFO\u001b[49m\u001b[22m: hi ~ null') >= 0
+    );
+
+    chalk.enabled = false;
+    assert.end();
+});
+
+function allocLogger(opts) {
+    opts = opts || {};
     var logger = DebugLogtron('debuglogtrontestcode', {
         env: {
             NODE_DEBUG: 'debuglogtrontestcode'
@@ -195,7 +221,8 @@ function allocLogger() {
                     msg: msg
                 });
             }
-        }
+        },
+        colors: opts.colors
     });
     logger.lines = [];
 

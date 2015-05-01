@@ -17,14 +17,8 @@ var COLOR_MAP = {
 
 /* Three steps
 
-    - add colors {
-        fatal: bgRed,
-        error: red,
-        warn: yellow,
-        info: green,
-        debug: blue
-    }
     - add verbose mode; default is WARN + ERROR; verbose === all
+    - make error & fatal throw
 
 */
 
@@ -38,6 +32,8 @@ function DebugLogBackend(namespace, opts) {
     var self = this;
 
     self.console = opts.console || globalConsole;
+    self.colors = typeof opts.colors === 'boolean' ?
+        opts.colors : true;
     /*eslint no-process-env: 0*/
     self.env = opts.env || process.env;
     self.namespace = namespace.toUpperCase();
@@ -52,7 +48,8 @@ DebugLogBackend.prototype.createStream = function createStream() {
     var self = this;
 
     return DebugLogStream(self.namespace, {
-        console: self.console
+        console: self.console,
+        colors: self.colors
     });
 };
 
@@ -65,6 +62,7 @@ function DebugLogStream(namespace, opts) {
 
     self.namespace = namespace;
     self.console = opts.console;
+    self.colors = opts.colors;
 }
 
 DebugLogStream.prototype.write = function write(logRecord, cb) {
@@ -83,12 +81,14 @@ function formatMessage(logRecord) {
     var self = this;
     var pid = process.pid;
 
-    var color = COLOR_MAP[logRecord.levelName];
-
     var prefix = self.namespace + ' ' + pid + ': ' +
         logRecord.levelName.toUpperCase();
-    prefix = chalk[color](prefix);
-    prefix = chalk.bold(prefix);
+    var color = COLOR_MAP[logRecord.levelName];
+
+    if (self.colors) {
+        prefix = chalk[color](prefix);
+        prefix = chalk.bold(prefix);
+    }
 
     return prefix + ': ' + logRecord.fields.msg + ' ~ ' +
         inspect(logRecord.meta);
