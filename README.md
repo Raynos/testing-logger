@@ -33,12 +33,24 @@ This means its silent by default unless you start the process
 with the `NODE_DEBUG` environment variable. If you set
 `NODE_DEBUG=mylibrary` it will write to stderr.
 
+## Interface
+
+This library will re `throw` any `.error()` or `.fatal()` callsites.
+
+Any warns and infos can be made visable using `NODE_DEBUG=mylibrary`.
+
+Any debugs / access / trace can be made visible using
+`NODE_DEBUG=mylibraryverbose`.
+
+You can turn colors off with `--color false`
+
 ## Alternatives
 
 **Warning:** This a logger for testing! Not a default logger.
 
 If you want to add a default logger to your `dependencies` 
   then I strongly recommend you use [`null-logtron`][null-logtron]
+
 ## Motivation
 
 You want to instrument your application and your libraries
