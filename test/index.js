@@ -264,6 +264,30 @@ test('prints warn/info if NODE_DEBUG', function t(assert) {
     assert.end();
 });
 
+test('prints warn/info if enabled', function t(assert) {
+    var lines = [];
+    var logger = DebugLogtron('wat', {
+        console: {
+            error: function log(x) {
+                lines.push(x);
+            }
+        },
+        enabled: true
+    });
+
+    logger.info('hi');
+    assert.equal(lines.length, 1);
+
+    assert.ok(lines[0].indexOf('INFO: hi ~ null') >= 0);
+
+    lines = [];
+    logger.debug('roflcopter');
+
+    assert.equal(lines.length, 0);
+
+    assert.end();
+});
+
 test('prints debug/access/trace if NODE_DEBUG verbose', function t(assert) {
     var lines = [];
     var logger = DebugLogtron('wat', {
@@ -275,6 +299,37 @@ test('prints debug/access/trace if NODE_DEBUG verbose', function t(assert) {
         env: {
             NODE_DEBUG: 'watverbose'
         }
+    });
+
+    logger.debug('hi');
+    assert.equal(lines.length, 1);
+
+    assert.ok(lines[0].indexOf('DEBUG: hi ~ null') >= 0);
+
+    logger.info('hi');
+
+    assert.equal(lines.length, 2);
+    assert.ok(lines[1].indexOf('INFO: hi ~ null') >= 0);
+
+    assert.throws(function throwIt() {
+        logger.error('hi');
+    }, 'hi');
+
+    assert.equal(lines.length, 3);
+    assert.ok(lines[2].indexOf('ERROR: hi ~ null') >= 0);
+
+    assert.end();
+});
+
+test('prints debug/access/trace if verbose', function t(assert) {
+    var lines = [];
+    var logger = DebugLogtron('wat', {
+        console: {
+            error: function log(x) {
+                lines.push(x);
+            }
+        },
+        verbose: true
     });
 
     logger.debug('hi');

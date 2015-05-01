@@ -18,6 +18,7 @@ var COLOR_MAP = {
 module.exports = DebugLogBackend;
 
 function DebugLogBackend(namespace, opts) {
+    /*eslint max-statements: [2, 25]*/
     if (!(this instanceof DebugLogBackend)) {
         return new DebugLogBackend(namespace, opts);
     }
@@ -40,7 +41,10 @@ function DebugLogBackend(namespace, opts) {
     self.enabled = regex.test(debugEnviron);
     self.verbose = verboseRegex.test(debugEnviron);
 
-    if (self.verbose) {
+    if (opts.verbose) {
+        self.verbose = true;
+    }
+    if (self.verbose || opts.enabled) {
         self.enabled = true;
     }
 }
