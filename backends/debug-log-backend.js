@@ -1,7 +1,16 @@
 'use strict';
 
-var globalDebuglog = require('debuglog');
 var inspect = require('util').inspect;
+var process = require('process');
+var globalConsole = require('console');
+
+/* Three steps
+
+    - inline debuglog
+    - add colors
+    - add verbose mode; default is WARN + ERROR; verbose === all
+
+*/
 
 module.exports = DebugLogBackend;
 
@@ -10,32 +19,56 @@ function DebugLogBackend(namespace, opts) {
         return new DebugLogBackend(namespace, opts);
     }
 
-    var debuglog = opts.debuglog ||
-        /*istanbul ignore next */ globalDebuglog;
-
-    this.log = debuglog(namespace);
-}
-
-var proto = DebugLogBackend.prototype;
-
-proto.createStream = function createStream() {
     var self = this;
 
-    var stream = {
-        write: write
-    };
+    self.console = opts.console || globalConsole;
+    /*eslint no-process-env: 0*/
+    self.env = opts.env || process.env;
+    self.namespace = namespace.toUpperCase();
 
-    return stream;
+    var debugEnviron = self.env.NODE_DEBUG || '';
+    var regex = new RegExp('\\b' + self.namespace + '\\b', 'i');
 
-    function write(logRecord, cb) {
-        var msg = logRecord.levelName + ': ' +
-            logRecord.fields.msg + ' ~ ' +
-            inspect(logRecord.meta);
+    self.enabled = regex.test(debugEnviron);
+}
 
-        self.log(msg);
+DebugLogBackend.prototype.createStream = function createStream() {
+    var self = this;
 
-        if (cb) {
-            cb();
-        }
+    return DebugLogStream(self.namespace, {
+        console: self.console
+    });
+};
+
+function DebugLogStream(namespace, opts) {
+    if (!(this instanceof DebugLogStream)) {
+        return new DebugLogStream(namespace, opts);
     }
+
+    var self = this;
+
+    self.namespace = namespace;
+    self.console = opts.console;
+}
+
+DebugLogStream.prototype.write = function write(logRecord, cb) {
+    var self = this;
+
+    var msg = self.formatMessage(logRecord);
+    self.console.error(msg);
+
+    if (cb) {
+        cb();
+    }
+};
+
+DebugLogStream.prototype.formatMessage =
+function formatMessage(logRecord) {
+    var self = this;
+    var pid = process.pid;
+
+    return self.namespace + ' ' + pid + ': ' +
+        logRecord.levelName + ': ' +
+        logRecord.fields.msg + ' ~ ' +
+        inspect(logRecord.meta);
 };

@@ -21,8 +21,7 @@ test('can create logger', function t(assert) {
     assert.equal(logger.lines.length, 1);
 
     var line = logger.lines[0];
-    assert.equal(line.namespace, 'debuglogtron');
-    assert.equal(line.msg, 'debug: hi ~ null');
+    assert.ok(line.msg.indexOf('debug: hi ~ null') >= 0);
 
     assert.end();
 });
@@ -37,8 +36,7 @@ test('can log async', function t(assert) {
         assert.equal(logger.lines.length, 1);
 
         var line = logger.lines[0];
-        assert.equal(line.namespace, 'debuglogtron');
-        assert.equal(line.msg, 'debug: oh hi ~ {}');
+        assert.ok(line.msg.indexOf('debug: oh hi ~ {}') >= 0);
 
         assert.end();
     }
@@ -81,32 +79,25 @@ test('logger levels', function t(assert) {
     assert.equal(logger.lines.length, 7);
 
     var line = logger.lines[0];
-    assert.equal(line.namespace, 'debuglogtron');
-    assert.equal(line.msg, 'trace: trace ~ null');
+    assert.ok(line.msg.indexOf('trace: trace ~ null') >= 0);
 
     var line2 = logger.lines[1];
-    assert.equal(line2.namespace, 'debuglogtron');
-    assert.equal(line2.msg, 'debug: debug ~ null');
+    assert.ok(line2.msg.indexOf('debug: debug ~ null') >= 0);
 
     var line3 = logger.lines[2];
-    assert.equal(line3.namespace, 'debuglogtron');
-    assert.equal(line3.msg, 'info: info ~ null');
+    assert.ok(line3.msg.indexOf('info: info ~ null') >= 0);
 
     var line4 = logger.lines[3];
-    assert.equal(line4.namespace, 'debuglogtron');
-    assert.equal(line4.msg, 'access: access ~ null');
+    assert.ok(line4.msg.indexOf('access: access ~ null') >= 0);
 
     var line5 = logger.lines[4];
-    assert.equal(line5.namespace, 'debuglogtron');
-    assert.equal(line5.msg, 'warn: warn ~ null');
+    assert.ok(line5.msg.indexOf('warn: warn ~ null') >= 0);
 
     var line6 = logger.lines[5];
-    assert.equal(line6.namespace, 'debuglogtron');
-    assert.equal(line6.msg, 'error: error ~ null');
+    assert.ok(line6.msg.indexOf('error: error ~ null') >= 0);
 
     var line7 = logger.lines[6];
-    assert.equal(line7.namespace, 'debuglogtron');
-    assert.equal(line7.msg, 'fatal: fatal ~ null');
+    assert.ok(line7.msg.indexOf('fatal: fatal ~ null') >= 0);
 
     assert.end();
 });
@@ -133,9 +124,8 @@ test('serialize meta', function t(assert) {
     assert.equal(logger.lines.length, 1);
     var line = logger.lines[0];
 
-    assert.equal(line.namespace, 'debuglogtron');
-    assert.equal(line.msg, 'info: hello ~ ' +
-        '{ complex: { nested: true, foo: \'bar\' } }');
+    assert.ok(line.msg.indexOf('info: hello ~ ' +
+        '{ complex: { nested: true, foo: \'bar\' } }') >= 0);
 
     assert.end();
 });
@@ -193,21 +183,19 @@ test('LogMessage to buffer', function t(assert) {
 });
 
 function allocLogger() {
-    /* eslint no-process-env: 0 */
-    var prev = process.env.NODE_DEBUG;
-    process.env.NODE_DEBUG = 'debuglogtrontestcode';
-    var logger = DebugLogtron('debuglogtron', {
-        debuglog: function fakeDebuglog(namespace) {
-            return function logStatement(msg) {
+    var logger = DebugLogtron('debuglogtrontestcode', {
+        env: {
+            NODE_DEBUG: 'debuglogtrontestcode'
+        },
+        console: {
+            error: function logStatement(msg) {
                 logger.lines.push({
-                    namespace: namespace,
                     msg: msg
                 });
-            };
+            }
         }
     });
     logger.lines = [];
-    process.env.NODE_DEBUG = prev;
 
     return logger;
 }
