@@ -352,6 +352,33 @@ test('prints debug/access/trace if verbose', function t(assert) {
     assert.end();
 });
 
+test('writes to assert comment', function t(assert) {
+    var lines = [];
+    var comments = [];
+    var logger = DebugLogtron('wat', {
+        console: {
+            error: function log(x) {
+                lines.push(x);
+            }
+        },
+        assert: {
+            comment: function comment(x) {
+                comments.push(x);
+            }
+        },
+        verbose: true
+    });
+
+    logger.debug('hi');
+
+    assert.equal(lines.length, 0);
+    assert.equal(comments.length, 1);
+
+    assert.ok(comments[0].indexOf('DEBUG: hi ~ null') >= 0);
+
+    assert.end();
+});
+
 function allocLogger(opts) {
     opts = opts || {};
     var logger = DebugLogtron('debuglogtrontestcode', {

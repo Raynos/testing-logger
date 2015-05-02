@@ -26,6 +26,7 @@ function DebugLogBackend(namespace, opts) {
     var self = this;
 
     self.console = opts.console || globalConsole;
+    self.assert = opts.assert;
     self.colors = typeof opts.colors === 'boolean' ?
         opts.colors : true;
     /*eslint no-process-env: 0*/
@@ -54,6 +55,7 @@ DebugLogBackend.prototype.createStream = function createStream() {
 
     return DebugLogStream(self.namespace, {
         console: self.console,
+        assert: self.assert,
         colors: self.colors,
         enabled: self.enabled,
         verbose: self.verbose
@@ -69,12 +71,14 @@ function DebugLogStream(namespace, opts) {
 
     self.namespace = namespace;
     self.console = opts.console;
+    self.assert = opts.assert;
     self.colors = opts.colors;
     self.enabled = opts.enabled;
     self.verbose = opts.verbose;
 }
 
 DebugLogStream.prototype.write = function write(logRecord, cb) {
+    /*eslint complexity: [2, 15]*/
     var self = this;
 
     var levelName = logRecord.levelName;
@@ -88,7 +92,11 @@ DebugLogStream.prototype.write = function write(logRecord, cb) {
                 levelName === 'trace'))
     ) {
         var msg = self.formatMessage(logRecord);
-        self.console.error(msg);
+        if (self.assert) {
+            self.assert.comment(msg);
+        } else {
+            self.console.error(msg);
+        }
     }
 
     if (levelName === 'fatal' || levelName === 'error') {
