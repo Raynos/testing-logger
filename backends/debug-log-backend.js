@@ -103,10 +103,9 @@ DebugLogStream.prototype.write = function write(logRecord, cb) {
 DebugLogStream.prototype.formatMessage =
 function formatMessage(logRecord) {
     var self = this;
-    var pid = process.pid;
 
-    var prefix = self.namespace + ' ' + pid + ': ' +
-        logRecord.levelName.toUpperCase();
+    var prefix = self.namespace + ' ' +
+        logRecord.levelName.toUpperCase() + ':';
     var color = COLOR_MAP[logRecord.levelName];
 
     if (self.colors) {
@@ -114,6 +113,6 @@ function formatMessage(logRecord) {
         prefix = chalk.bold(prefix);
     }
 
-    return prefix + ': ' + logRecord.fields.msg + ' ~ ' +
+    return prefix + ' ' + logRecord.fields.msg + ' ~ ' +
         inspect(logRecord.meta);
 };

@@ -207,7 +207,7 @@ test('logger respects color option', function t(assert) {
 
     var line2 = logger2.lines[0].msg;
     assert.ok(
-        line2.indexOf('INFO\u001b[49m\u001b[22m: hi ~ null') >= 0
+        line2.indexOf('INFO:\u001b[49m\u001b[22m hi ~ null') >= 0
     );
 
     chalk.enabled = false;
