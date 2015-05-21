@@ -221,7 +221,8 @@ test('always prints error/fatal', function t(assert) {
             error: function log(x) {
                 lines.push(x);
             }
-        }
+        },
+        enabled: false
     });
 
     assert.throws(function throwIt() {

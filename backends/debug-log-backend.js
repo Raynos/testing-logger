@@ -39,7 +39,8 @@ function DebugLogBackend(namespace, opts) {
         '\\b' + self.namespace + 'verbose\\b', 'i'
     );
 
-    self.enabled = regex.test(debugEnviron);
+    self.enabled = typeof opts.enabled === 'boolean' ?
+        opts.enabled : true;
     self.verbose = verboseRegex.test(debugEnviron);
 
     if (opts.verbose) {
