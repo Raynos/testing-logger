@@ -12,8 +12,8 @@ A debug logger with a logtron interface.
 
 ## Example
 
-This logger does nothing unless you start the process with
-  `NODE_DEBUG=mylibrary`.
+This logger is designed for tests; it prints info & above
+and prints debugs if you set `NODE_DEBUG=mylibrary`
 
 ```js
 var DebugLogtron = require("debug-logtron");
@@ -26,23 +26,49 @@ logger.warn('some fixed string', { some: 'meta object' });
 logger.error('some fixed string', { some: 'meta object' });
 ```
 
-`debug-logtron` will internally use [`debuglog`][debuglog] to
-write your logs.
+It writes all logs to stderr. If you call `logger.error()` or
+`logger.fatal()` it will throw exceptions. any error callsites
+are bugs.
 
-This means its silent by default unless you start the process
-with the `NODE_DEBUG` environment variable. If you set
-`NODE_DEBUG=mylibrary` it will write to stderr.
+warns go to stderr by default.
+
+## Using in tests
+
+You can use the `.whitelist()` and `.items()` method to make
+testing easier
+
+```
+var DebugLogtron = require('debug-logtron');
+var test = require('tape');
+ 
+test('some module', function t(assert) {
+    var logger = NullLogtron('mything');
+    var thing = new Thing({ logger: logger })
+ 
+    logger.whitelist('error', 'some msg');
+
+    thing.doStuff();
+ 
+    var items = logger.items();
+    assert.equal(items.filter(function (x) {
+        return x.levelName === 'error'
+    }).length, 1, 'thing writes to logger.error()');
+    assert.end();
+});
+```
 
 ## Interface
 
 This library will re `throw` any `.error()` or `.fatal()` callsites.
 
-Any warns and infos can be made visable using `NODE_DEBUG=mylibrary`.
+Any warns and infos got to stderr.
 
-Any debugs / access / trace can be made visible using
-`NODE_DEBUG=mylibraryverbose`.
+Any debugs / access can be made visible using
+`NODE_DEBUG=mylibrary`.
 
 You can turn colors off with `--color false`
+
+If you want to see trace() logs you must set `NODE_DEBUG=mylibrary TRACE=1`
 
 ## Alternatives
 
