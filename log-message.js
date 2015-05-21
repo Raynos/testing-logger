@@ -15,7 +15,7 @@ module.exports = LogMessage;
 
 function LogMessage(level, msg, meta, time) {
     if (!(this instanceof LogMessage)) {
-        return new LogMessage(level, msg, meta);
+        return new LogMessage(level, msg, meta, time);
     }
 
     this.level = level;
