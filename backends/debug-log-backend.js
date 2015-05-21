@@ -33,6 +33,17 @@ function DebugLogBackend(namespace, opts) {
     self.env = opts.env || process.env;
     self.namespace = namespace.toUpperCase();
 
+    self.whitelists = {
+        fatal: {},
+        error: {},
+        warn: {},
+        access: {},
+        info: {},
+        debug: {},
+        trace: {}
+    };
+    self.records = [];
+
     var debugEnviron = self.env.NODE_DEBUG || '';
     var regex = new RegExp('\\b' + self.namespace + '\\b', 'i');
 
@@ -46,6 +57,12 @@ function DebugLogBackend(namespace, opts) {
         self.enabled = true;
     }
 }
+
+DebugLogBackend.prototype.whitelist = function whitelist(level, msg) {
+    var self = this;
+
+    self.whitelists[level][msg] = true;
+};
 
 DebugLogBackend.prototype.createStream = function createStream() {
     var self = this;
@@ -69,6 +86,16 @@ DebugLogStream.prototype.write = function write(logRecord, cb) {
     var self = this;
 
     var levelName = logRecord.levelName;
+
+    var whitelist = self.backend.whitelists[levelName];
+    if (whitelist[logRecord.fields.msg]) {
+        self.backend.records.push(logRecord);
+
+        if (cb) {
+            cb();
+        }
+        return;
+    }
 
     if (
         (levelName === 'fatal' || levelName === 'error') ||

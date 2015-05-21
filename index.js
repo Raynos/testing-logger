@@ -57,6 +57,14 @@ proto._log = function _log(level, msg, meta, cb) {
     this._stream.write(logMessage.toLogRecord(), cb);
 };
 
+proto.whitelist = function whitelist(level, msg) {
+    this._backend.whitelist(level, msg);
+};
+
+proto.items = function items() {
+    return this._backend.records;
+};
+
 proto.trace = function trace(msg, meta, cb) {
     this._log(LEVELS.trace, msg, meta, cb);
 };
