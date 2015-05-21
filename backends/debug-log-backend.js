@@ -50,30 +50,18 @@ function DebugLogBackend(namespace, opts) {
 DebugLogBackend.prototype.createStream = function createStream() {
     var self = this;
 
-    return DebugLogStream(self.namespace, {
-        console: self.console,
-        assert: self.assert,
-        colors: self.colors,
-        enabled: self.enabled,
-        verbose: self.verbose,
-        trace: self.trace
-    });
+    return DebugLogStream(self.namespace, self);
 };
 
-function DebugLogStream(namespace, opts) {
+function DebugLogStream(namespace, backend) {
     if (!(this instanceof DebugLogStream)) {
-        return new DebugLogStream(namespace, opts);
+        return new DebugLogStream(namespace, backend);
     }
 
     var self = this;
 
     self.namespace = namespace;
-    self.console = opts.console;
-    self.assert = opts.assert;
-    self.colors = opts.colors;
-    self.enabled = opts.enabled;
-    self.verbose = opts.verbose;
-    self.trace = opts.trace;
+    self.backend = backend;
 }
 
 DebugLogStream.prototype.write = function write(logRecord, cb) {
@@ -84,17 +72,17 @@ DebugLogStream.prototype.write = function write(logRecord, cb) {
 
     if (
         (levelName === 'fatal' || levelName === 'error') ||
-        (self.enabled &&
+        (self.backend.enabled &&
             (levelName === 'warn' || levelName === 'info')) ||
-        (self.verbose &&
+        (self.backend.verbose &&
             (levelName === 'access' || levelName === 'debug')) ||
-        (self.trace && levelName === 'trace')
+        (self.backend.trace && levelName === 'trace')
     ) {
         var msg = self.formatMessage(logRecord);
-        if (self.assert) {
-            self.assert.comment(msg);
+        if (self.backend.assert) {
+            self.backend.assert.comment(msg);
         } else {
-            self.console.error(msg);
+            self.backend.console.error(msg);
         }
     }
 
@@ -115,7 +103,7 @@ function formatMessage(logRecord) {
         logRecord.levelName.toUpperCase() + ':';
     var color = COLOR_MAP[logRecord.levelName];
 
-    if (self.colors) {
+    if (self.backend.colors) {
         prefix = chalk[color](prefix);
         prefix = chalk.bold(prefix);
     }
