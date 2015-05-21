@@ -39,11 +39,10 @@ function DebugLogBackend(namespace, opts) {
     self.enabled = typeof opts.enabled === 'boolean' ?
         opts.enabled : true;
     self.verbose = opts.verbose || regex.test(debugEnviron);
+    self.trace = typeof opts.trace === 'boolean' ?
+        opts.trace : (self.verbose && !!self.env.TRACE);
 
-    if (opts.verbose) {
-        self.verbose = true;
-    }
-    if (self.verbose || opts.enabled) {
+    if (self.verbose) {
         self.enabled = true;
     }
 }
@@ -56,7 +55,8 @@ DebugLogBackend.prototype.createStream = function createStream() {
         assert: self.assert,
         colors: self.colors,
         enabled: self.enabled,
-        verbose: self.verbose
+        verbose: self.verbose,
+        trace: self.trace
     });
 };
 
@@ -73,6 +73,7 @@ function DebugLogStream(namespace, opts) {
     self.colors = opts.colors;
     self.enabled = opts.enabled;
     self.verbose = opts.verbose;
+    self.trace = opts.trace;
 }
 
 DebugLogStream.prototype.write = function write(logRecord, cb) {
@@ -86,8 +87,8 @@ DebugLogStream.prototype.write = function write(logRecord, cb) {
         (self.enabled &&
             (levelName === 'warn' || levelName === 'info')) ||
         (self.verbose &&
-            (levelName === 'access' || levelName === 'debug' ||
-                levelName === 'trace'))
+            (levelName === 'access' || levelName === 'debug')) ||
+        (self.trace && levelName === 'trace')
     ) {
         var msg = self.formatMessage(logRecord);
         if (self.assert) {

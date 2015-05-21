@@ -412,6 +412,7 @@ function allocLogger(opts) {
                 });
             }
         },
+        trace: true,
         colors: opts.colors
     });
     logger.lines = [];
