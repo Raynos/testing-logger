@@ -239,16 +239,13 @@ test('always prints error/fatal', function t(assert) {
     assert.end();
 });
 
-test('prints warn/info if NODE_DEBUG', function t(assert) {
+test('prints warn/info by default', function t(assert) {
     var lines = [];
     var logger = DebugLogtron('wat', {
         console: {
             error: function log(x) {
                 lines.push(x);
             }
-        },
-        env: {
-            NODE_DEBUG: 'wat'
         }
     });
 
@@ -289,7 +286,29 @@ test('prints warn/info if enabled', function t(assert) {
     assert.end();
 });
 
-test('prints debug/access/trace if NODE_DEBUG verbose', function t(assert) {
+test('does not prints warn/info if disabled', function t(assert) {
+    var lines = [];
+    var logger = DebugLogtron('wat', {
+        console: {
+            error: function log(x) {
+                lines.push(x);
+            }
+        },
+        enabled: false
+    });
+
+    logger.info('hi');
+    assert.equal(lines.length, 0);
+
+    lines = [];
+    logger.debug('roflcopter');
+
+    assert.equal(lines.length, 0);
+
+    assert.end();
+});
+
+test('prints debug/access/trace if NODE_DEBUG', function t(assert) {
     var lines = [];
     var logger = DebugLogtron('wat', {
         console: {
@@ -298,7 +317,7 @@ test('prints debug/access/trace if NODE_DEBUG verbose', function t(assert) {
             }
         },
         env: {
-            NODE_DEBUG: 'watverbose'
+            NODE_DEBUG: 'wat'
         }
     });
 
@@ -384,8 +403,7 @@ function allocLogger(opts) {
     opts = opts || {};
     var logger = DebugLogtron('debuglogtrontestcode', {
         env: {
-            NODE_DEBUG: 'debuglogtrontestcode ' +
-                'debuglogtrontestcodeverbose'
+            NODE_DEBUG: 'debuglogtrontestcode'
         },
         console: {
             error: function logStatement(msg) {

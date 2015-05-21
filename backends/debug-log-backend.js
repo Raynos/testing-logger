@@ -35,13 +35,10 @@ function DebugLogBackend(namespace, opts) {
 
     var debugEnviron = self.env.NODE_DEBUG || '';
     var regex = new RegExp('\\b' + self.namespace + '\\b', 'i');
-    var verboseRegex = new RegExp(
-        '\\b' + self.namespace + 'verbose\\b', 'i'
-    );
 
     self.enabled = typeof opts.enabled === 'boolean' ?
         opts.enabled : true;
-    self.verbose = verboseRegex.test(debugEnviron);
+    self.verbose = opts.verbose || regex.test(debugEnviron);
 
     if (opts.verbose) {
         self.verbose = true;
