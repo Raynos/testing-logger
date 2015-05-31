@@ -3,7 +3,8 @@
 var inspect = require('util').inspect;
 var process = require('process');
 var globalConsole = require('console');
-var chalk = require('chalk');
+
+var TermColor = require('../lib/term-color.js');
 
 var COLOR_MAP = {
     fatal: 'bgRed',
@@ -131,8 +132,8 @@ function formatMessage(logRecord) {
     var color = COLOR_MAP[logRecord.levelName];
 
     if (self.backend.colors) {
-        prefix = chalk[color](prefix);
-        prefix = chalk.bold(prefix);
+        prefix = TermColor[color](prefix);
+        prefix = TermColor.bold(prefix);
     }
 
     return prefix + ' ' + logRecord.fields.msg + ' ~ ' +

@@ -3,9 +3,10 @@
 var test = require('tape');
 var process = require('process/');
 var os = require('os');
-var chalk = require('chalk');
 
-chalk.enabled = false;
+var TermColor = require('../lib/term-color.js');
+
+TermColor.enabled = false;
 
 var DebugLogtron = require('../index.js');
 var LogMessage = require('../log-message.js');
@@ -191,7 +192,7 @@ test('LogMessage to buffer', function t(assert) {
 });
 
 test('logger respects color option', function t(assert) {
-    chalk.enabled = true;
+    TermColor.enabled = true;
     var logger1 = allocLogger({
         colors: false
     });
@@ -210,7 +211,7 @@ test('logger respects color option', function t(assert) {
         line2.indexOf('INFO:\u001b[49m\u001b[22m hi ~ null') >= 0
     );
 
-    chalk.enabled = false;
+    TermColor.enabled = false;
     assert.end();
 });
 
