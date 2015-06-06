@@ -29,9 +29,7 @@ function LogMessage(level, msg, meta, time) {
     this._buffer = null;
 }
 
-var proto = LogMessage.prototype;
-
-proto.toLogRecord = function toBuffer() {
+LogMessage.prototype.toLogRecord = function toLogRecord() {
     if (!this._jsonLogRecord) {
         this._jsonLogRecord = new JSONLogRecord(
             this.level, this.msg, this.meta, this._time);
@@ -40,7 +38,7 @@ proto.toLogRecord = function toBuffer() {
     return this._jsonLogRecord;
 };
 
-proto.toBuffer = function toBuffer() {
+LogMessage.prototype.toBuffer = function toBuffer() {
     if (!this._buffer) {
         var logRecord = this.toLogRecord();
 
