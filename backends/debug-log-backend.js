@@ -82,10 +82,11 @@ function DebugLogStream(namespace, backend) {
     self.backend = backend;
 }
 
-DebugLogStream.prototype.write = function write(logRecord, cb) {
+DebugLogStream.prototype.write = function write(logMessage, cb) {
     /*eslint complexity: [2, 15]*/
     var self = this;
 
+    var logRecord = logMessage.toLogRecord();
     var levelName = logRecord.levelName;
 
     var whitelist = self.backend.whitelists[levelName];

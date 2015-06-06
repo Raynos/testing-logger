@@ -52,9 +52,7 @@ proto._log = function _log(level, msg, meta, cb) {
     var logMessage = new LogMessage(level, msg, meta);
     LogMessage.isValid(logMessage);
 
-    logMessage.name = this.name;
-
-    this._stream.write(logMessage.toLogRecord(), cb);
+    this._stream.write(logMessage, cb);
 };
 
 proto.whitelist = function whitelist(level, msg) {
