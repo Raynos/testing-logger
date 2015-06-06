@@ -3,9 +3,21 @@
 var inspect = require('util').inspect;
 var process = require('process');
 var globalConsole = require('console');
+var TypedError = require('error/typed');
 
 var TermColor = require('../lib/term-color.js');
 
+var validNamespaceRegex = /^[a-zA-Z0-9]+$/;
+var InvalidNamespaceError = TypedError({
+    type: 'debug-logtron.invalid-argument.namespace',
+    message: 'Unexpected characters in the `namespace` arg.\n' +
+        'Expected the namespace to be a bare word but instead ' +
+            'found {badChar} character.\n' +
+        'SUGGESTED FIX: Use just alphanum in the namespace.\n',
+    badChar: null,
+    reason: null,
+    namespace: null
+});
 var COLOR_MAP = {
     fatal: 'bgRed',
     error: 'bgRed',
@@ -25,6 +37,19 @@ function DebugLogBackend(namespace, opts) {
     }
 
     var self = this;
+
+    var isValid = validNamespaceRegex.test(namespace);
+    if (!isValid) {
+        var hasHypen = namespace.indexOf('-') >= 0;
+        var hasSpace = namespace.indexOf(' ') >= 0;
+
+        throw InvalidNamespaceError({
+            namespace: namespace,
+            badChar: hasHypen ? '-' : hasSpace ? 'space' : 'bad',
+            reason: hasHypen ? 'hypen' :
+                hasSpace ? 'space' : 'unknown'
+        });
+    }
 
     self.console = opts.console || globalConsole;
     self.assert = opts.assert;
