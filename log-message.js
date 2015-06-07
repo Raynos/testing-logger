@@ -13,10 +13,6 @@ LogMessage.JSONLogRecord = JSONLogRecord;
 module.exports = LogMessage;
 
 function LogMessage(level, msg, meta, time) {
-    if (!(this instanceof LogMessage)) {
-        return new LogMessage(level, msg, meta, time);
-    }
-
     this.level = level;
     this.levelName = LEVELS[level];
     this.msg = msg;
@@ -50,28 +46,26 @@ LogMessage.prototype.toBuffer = function toBuffer() {
 
 /* JSONLogRecord. The same interface as bunyan on the wire */
 function JSONLogRecord(level, msg, meta, time) {
-    if (!(this instanceof JSONLogRecord)) {
-        return new JSONLogRecord(level, msg, meta, time);
-    }
-
-    this._logData = {
-        name: null,
-        hostname: os.hostname(),
-        pid: process.pid,
-        component: null,
-        level: LEVELS[level],
-        msg: msg,
-        time: time || (new Date()).toISOString(),
-        src: null,
-        v: 0,
-
-        // Non standard
-        fields: meta
-    };
+    this._logData = new LogData(level, msg, meta, time);
 
     this.msg = msg;
     this.levelName = LEVELS[level];
     this.meta = meta;
+}
+
+function LogData(level, msg, meta, time) {
+    this.name = null;
+    this.hostname = os.hostname();
+    this.pid = process.pid;
+    this.component = null;
+    this.level = LEVELS[level];
+    this.msg = msg;
+    this.time = time || (new Date()).toISOString();
+    this.src = null;
+    this.v = 0;
+
+    // Non standard
+    this.fields = meta;
 }
 
 function isValid(logRecord) {

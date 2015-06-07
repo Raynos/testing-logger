@@ -10,7 +10,6 @@ TermColor.enabled = false;
 
 var DebugLogtron = require('../index.js');
 var LogMessage = require('../log-message.js');
-var JSONLogRecord = LogMessage.JSONLogRecord;
 
 test('DebugLogtron is a function', function t(assert) {
     assert.equal(typeof DebugLogtron, 'function');
@@ -139,33 +138,11 @@ test('serialize meta', function t(assert) {
     assert.end();
 });
 
-test('JSONLogRecord without new', function t(assert) {
-    var logRecord = JSONLogRecord(20, 'hi', null);
-
-    assert.ok(logRecord);
-    assert.equal(logRecord.levelName, 'debug');
-    assert.equal(logRecord.meta, null);
-    assert.equal(logRecord.msg, 'hi');
-
-    assert.end();
-});
-
-test('LogMessage without new', function t(assert) {
-    var logMessage = LogMessage(20, 'hi', null);
-
-    assert.ok(logMessage);
-    assert.equal(logMessage.levelName, 'debug');
-    assert.equal(logMessage.meta, null);
-    assert.equal(logMessage.msg, 'hi');
-
-    assert.end();
-});
-
 test('LogMessage to buffer', function t(assert) {
     var hostname = os.hostname();
 
     var time = (new Date()).toISOString();
-    var logMessage = LogMessage(20, 'hi', null, time);
+    var logMessage = new LogMessage(20, 'hi', null, time);
 
     var buf = logMessage.toBuffer();
 
