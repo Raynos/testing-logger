@@ -60,7 +60,7 @@ function JSONLogRecord(level, msg, meta, time) {
         hostname: os.hostname(),
         pid: process.pid,
         component: null,
-        level: level,
+        level: LEVELS[level],
         msg: msg,
         time: time || (new Date()).toISOString(),
         src: null,
