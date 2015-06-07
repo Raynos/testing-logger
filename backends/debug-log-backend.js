@@ -115,7 +115,7 @@ DebugLogStream.prototype.write = function write(logMessage, cb) {
     var levelName = logRecord.levelName;
 
     var whitelist = self.backend.whitelists[levelName];
-    if (whitelist[logRecord.fields.msg]) {
+    if (whitelist[logRecord.msg]) {
         self.backend.records.push(logRecord);
 
         if (cb) {
@@ -141,7 +141,7 @@ DebugLogStream.prototype.write = function write(logMessage, cb) {
     }
 
     if (levelName === 'fatal' || levelName === 'error') {
-        throw new Error(logRecord.fields.msg);
+        throw new Error(logRecord.msg);
     }
 
     if (cb) {
@@ -162,6 +162,6 @@ function formatMessage(logRecord) {
         prefix = TermColor.bold(prefix);
     }
 
-    return prefix + ' ' + logRecord.fields.msg + ' ~ ' +
+    return prefix + ' ' + logRecord.msg + ' ~ ' +
         inspect(logRecord.meta);
 };

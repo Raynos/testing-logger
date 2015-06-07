@@ -4,7 +4,6 @@ var assert = require('assert');
 var process = require('process/');
 var os = require('os');
 var Buffer = require('buffer').Buffer;
-var extend = require('xtend');
 
 var LEVELS = require('./levels.js').LEVELS_BY_VALUE;
 
@@ -42,7 +41,7 @@ LogMessage.prototype.toBuffer = function toBuffer() {
     if (!this._buffer) {
         var logRecord = this.toLogRecord();
 
-        var jsonStr = JSON.stringify(logRecord.fields);
+        var jsonStr = JSON.stringify(logRecord._logData);
         this._buffer = new Buffer(jsonStr);
     }
 
@@ -55,7 +54,7 @@ function JSONLogRecord(level, msg, meta, time) {
         return new JSONLogRecord(level, msg, meta, time);
     }
 
-    this.fields = extend(meta, {
+    this._logData = {
         name: null,
         hostname: os.hostname(),
         pid: process.pid,
@@ -64,9 +63,13 @@ function JSONLogRecord(level, msg, meta, time) {
         msg: msg,
         time: time || (new Date()).toISOString(),
         src: null,
-        v: 0
-    });
+        v: 0,
 
+        // Non standard
+        fields: meta
+    };
+
+    this.msg = msg;
     this.levelName = LEVELS[level];
     this.meta = meta;
 }

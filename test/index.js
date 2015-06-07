@@ -145,7 +145,7 @@ test('JSONLogRecord without new', function t(assert) {
     assert.ok(logRecord);
     assert.equal(logRecord.levelName, 'debug');
     assert.equal(logRecord.meta, null);
-    assert.equal(logRecord.fields.msg, 'hi');
+    assert.equal(logRecord.msg, 'hi');
 
     assert.end();
 });
@@ -174,11 +174,12 @@ test('LogMessage to buffer', function t(assert) {
         '"hostname":"' + hostname + '",' +
         '"pid":' + process.pid + ',' +
         '"component":null,' +
-        '"level":20,' +
+        '"level":"debug",' +
         '"msg":"hi",' +
         '"time":"' + time + '",' +
         '"src":null,' +
-        '"v":0}'
+        '"v":0,' +
+        '"fields":null}'
     );
 
     var buf2 = logMessage.toBuffer();
@@ -412,7 +413,7 @@ test('can whitelist errors', function t(assert) {
     logger.error('oh hi');
 
     assert.equal(logger.items().length, 1);
-    assert.equal(logger.items()[0].fields.msg, 'oh hi');
+    assert.equal(logger.items()[0].msg, 'oh hi');
 
     assert.throws(function throwIt() {
         logger.error('oh hi 2');
