@@ -3,8 +3,7 @@
 var test = require('tape');
 var process = require('process/');
 var os = require('os');
-
-var TermColor = require('../lib/term-color.js');
+var TermColor = require('term-color');
 
 TermColor.enabled = false;
 

@@ -4,8 +4,7 @@ var inspect = require('util').inspect;
 var process = require('process');
 var globalConsole = require('console');
 var TypedError = require('error/typed');
-
-var TermColor = require('../lib/term-color.js');
+var TermColor = require('term-color');
 
 var validNamespaceRegex = /^[a-zA-Z0-9]+$/;
 var InvalidNamespaceError = TypedError({
