@@ -69,6 +69,9 @@ function DebugLogBackend(namespace, opts) {
     };
     self.records = [];
 
+    self.recordsByMessage = {};
+    self.logged = 0;
+
     var debugEnviron = self.env.NODE_DEBUG || '';
     var regex = new RegExp('\\b' + self.namespace + '\\b', 'i');
 
@@ -87,6 +90,28 @@ DebugLogBackend.prototype.whitelist = function whitelist(level, msg) {
     var self = this;
 
     self.whitelists[level][msg] = true;
+};
+
+DebugLogBackend.prototype.items = function items(level, msg) {
+    var self = this;
+
+    return self.records.slice();
+};
+
+DebugLogBackend.prototype.popLogs = function popLogs(message) {
+    var self = this;
+
+    var records = self.recordsByMessage[message];
+    delete self.recordsByMessage[message];
+
+    return records || [];
+};
+
+DebugLogBackend.prototype.isEmpty = function isEmpty() {
+    var self = this;
+
+    return self.logged === 0 &&
+        Object.keys(self.recordsByMessage).length === 0;
 };
 
 DebugLogBackend.prototype.createStream = function createStream() {
@@ -115,6 +140,10 @@ DebugLogStream.prototype.write = function write(logMessage, cb) {
 
     var whitelist = self.backend.whitelists[levelName];
     if (whitelist[logRecord.msg]) {
+        if (!self.backend.recordsByMessage[logRecord.msg]) {
+            self.backend.recordsByMessage[logRecord.msg] = [];
+        }
+        self.backend.recordsByMessage[logRecord.msg].push(logRecord);
         self.backend.records.push(logRecord);
 
         if (cb) {
@@ -131,6 +160,8 @@ DebugLogStream.prototype.write = function write(logMessage, cb) {
             (levelName === 'access' || levelName === 'debug')) ||
         (self.backend.trace && levelName === 'trace')
     ) {
+        self.backend.logged++;
+
         var msg = self.formatMessage(logRecord);
         if (self.backend.assert) {
             self.backend.assert.comment(msg);
