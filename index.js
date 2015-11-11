@@ -28,5 +28,13 @@ DebugLogtron.prototype.whitelist = function whitelist(level, msg) {
 };
 
 DebugLogtron.prototype.items = function items() {
-    return this._backend.records;
+    return this._backend.items();
+};
+
+DebugLogtron.prototype.popLogs = function popLogs(message) {
+    return this._backend.popLogs(message);
+};
+
+DebugLogtron.prototype.isEmpty = function isEmpty() {
+    return this._backend.isEmpty();
 };
