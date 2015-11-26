@@ -93,7 +93,7 @@ DebugLogBackend.prototype.unwhitelist = function unwhitelist(level, msg) {
     var self = this;
 
     self.whitelists[level][msg] = false;
-}
+};
 
 DebugLogBackend.prototype.createStream = function createStream() {
     var self = this;
