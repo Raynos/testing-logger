@@ -123,6 +123,7 @@ DebugLogStream.prototype.write = function write(logMessage, cb) {
     if (whitelist[logRecord.msg]) {
         self.backend.records.push(logRecord);
 
+        /* istanbul ignore else */
         if (cb) {
             cb();
         }
@@ -149,6 +150,7 @@ DebugLogStream.prototype.write = function write(logMessage, cb) {
         throw new Error(logRecord.msg);
     }
 
+    /* istanbul ignore else */
     if (cb) {
         cb();
     }
