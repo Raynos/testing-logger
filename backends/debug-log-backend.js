@@ -30,7 +30,7 @@ var COLOR_MAP = {
 module.exports = DebugLogBackend;
 
 function DebugLogBackend(namespace, opts) {
-    /*eslint max-statements: [2, 25]*/
+    /* eslint max-statements: [2, 25] */
     if (!(this instanceof DebugLogBackend)) {
         return new DebugLogBackend(namespace, opts);
     }
@@ -88,6 +88,12 @@ DebugLogBackend.prototype.whitelist = function whitelist(level, msg) {
 
     self.whitelists[level][msg] = true;
 };
+
+DebugLogBackend.prototype.unwhitelist = function unwhitelist(level, msg) {
+    var self = this;
+
+    self.whitelists[level][msg] = false;
+}
 
 DebugLogBackend.prototype.createStream = function createStream() {
     var self = this;

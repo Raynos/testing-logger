@@ -40,15 +40,15 @@ testing easier
 ```
 var DebugLogtron = require('debug-logtron');
 var test = require('tape');
- 
+
 test('some module', function t(assert) {
     var logger = NullLogtron('mything');
     var thing = new Thing({ logger: logger })
- 
+
     logger.whitelist('error', 'some msg');
 
     thing.doStuff();
- 
+
     var items = logger.items();
     assert.equal(items.filter(function (x) {
         return x.levelName === 'error'
@@ -56,6 +56,10 @@ test('some module', function t(assert) {
     assert.end();
 });
 ```
+
+Whilst it is recommended that you minimize state between tests by creating
+a new instance of debug-logtron, it is possible to remove a whitelisted item
+by calling `.unwhitelist` with the same arguments.
 
 ## Interface
 
@@ -74,7 +78,7 @@ If you want to see trace() logs you must set `NODE_DEBUG=mylibrary TRACE=1`
 
 **Warning:** This a logger for testing! Not a default logger.
 
-If you want to add a default logger to your `dependencies` 
+If you want to add a default logger to your `dependencies`
   then I strongly recommend you use [`null-logtron`][null-logtron]
 
 ## Motivation
