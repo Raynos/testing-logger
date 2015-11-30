@@ -402,6 +402,29 @@ test('can whitelist errors', function t(assert) {
     });
 });
 
+test('can unwhitelist errors', function t(assert) {
+    var logger = allocLogger();
+
+    assert.throws(function throwIt() {
+        logger.error('oh hi');
+    }, /oh hi/);
+
+    logger.whitelist('error', 'oh hi');
+
+    logger.error('oh hi');
+
+    assert.equal(logger.items().length, 1);
+    assert.equal(logger.items()[0].msg, 'oh hi');
+
+    logger.unwhitelist('error', 'oh hi');
+
+    assert.throws(function throwIt() {
+        logger.error('oh hi');
+    }, /oh hi/);
+
+    assert.end();
+});
+
 function allocLogger(opts) {
     opts = opts || {};
     var logger = DebugLogtron('debuglogtrontestcode', {

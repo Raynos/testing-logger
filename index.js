@@ -27,6 +27,10 @@ DebugLogtron.prototype.whitelist = function whitelist(level, msg) {
     this._backend.whitelist(level, msg);
 };
 
+DebugLogtron.prototype.unwhitelist = function unwhitelist(level, msg) {
+    this._backend.unwhitelist(level, msg);
+};
+
 DebugLogtron.prototype.items = function items() {
     return this._backend.records;
 };
