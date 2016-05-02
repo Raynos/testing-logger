@@ -6,13 +6,13 @@ var globalConsole = require('console');
 var TypedError = require('error/typed');
 var TermColor = require('term-color');
 
-var validNamespaceRegex = /^[a-zA-Z0-9]+$/;
+var validNamespaceRegex = /^[a-zA-Z0-9-]+$/;
 var InvalidNamespaceError = TypedError({
     type: 'debug-logtron.invalid-argument.namespace',
     message: 'Unexpected characters in the `namespace` arg.\n' +
-        'Expected the namespace to be a bare word but instead ' +
+        'Expected the namespace to be hypenated words but instead ' +
             'found {badChar} character.\n' +
-        'SUGGESTED FIX: Use just alphanum in the namespace.\n',
+        'SUGGESTED FIX: Use just alphanum and hyphen in the namespace.\n',
     badChar: null,
     reason: null,
     namespace: null
