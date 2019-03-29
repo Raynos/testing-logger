@@ -49,8 +49,8 @@ test('some module', function t(assert) {
 
     thing.doStuff();
 
-    var items = logger.items();
-    assert.equal(items.filter(function (x) {
+    var lines = logger.popLogs('some msg');
+    assert.equal(lines.filter(function (x) {
         return x.levelName === 'error'
     }).length, 1, 'thing writes to logger.error()');
     assert.end();
@@ -100,7 +100,47 @@ This works great together with `itape --trace` where you can
 
 ## Docs
 
-// TODO. State what the module does.
+### `logger.whitelist(level, message)`
+
+This whitelisted a tuple of level and message, for example:
+`logger.whitelist('warn', 'resetting connection')`
+
+This means that any callsites to `logger.warn('resetting connection', { ... })`
+will not be printed to STDOUT.
+
+If you call `whitelist()` in a test, it's expected you call `popLogs()`
+
+### `logger.unwhitelist(level, message)`
+
+inverse, resets the whitelist if you have a logger shared among tests. ( dont do that.. )
+
+### `logger.items()`
+
+Just returns every item that has been whitelisted from the logger, can be used
+for assertion purposes.
+
+### `logger.popLogs(message)`
+
+This will return all log lines for that message ( including all levels ).
+This is a short hand for filtering `items()` by message.
+
+Calling `popLogs()` will also decrease the internal counter used by `isEmpty()`.
+This can be used to make sure that test cases write assertions against everything
+that was logged.
+
+#### `logger.isEmpty()`
+
+Returns whether nothing was logged. Most of the time in tests you don't want anything
+to be logged to STDOUT.
+
+If you do expect log callsites to get triggered ( info, warn, error, etc ) during tests
+then you can use `whitelist()` and `popLogs()`.
+
+You must call `popLogs()` to decrement the counter so that `isEmpty()` returns `true`.
+
+This is especially useful if someone refactors the code by adding or removing loglines
+which will cause existing tests to fail ( either `isEmpty()` fails because `popLogs()` was not
+called for a new logline, or `popLogs()` fails because a logline was removed ).
 
 ## Installation
 
