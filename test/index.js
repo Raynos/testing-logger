@@ -49,11 +49,11 @@ test('logger throws with bad namespace', function t(assert) {
         DebugLogtron('bad name');
     }, /found space character/);
     assert.throws(function throwIt() {
-        DebugLogtron('bad-name');
-    }, /found - character/);
-    assert.throws(function throwIt() {
         DebugLogtron('bad#name');
     }, /found bad character/);
+    assert.doesNotThrow(function throwNothing() {
+        DebugLogtron('hypenated-name');
+    }, /found - character/);
 
     assert.end();
 });
