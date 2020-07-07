@@ -4,20 +4,26 @@
 const inspect = require('util').inspect
 const process = require('process')
 const globalConsole = require('console')
-const TypedError = require('error/typed')
 const TermColor = require('term-color')
 
 const validNamespaceRegex = /^[a-zA-Z0-9]+$/
-const InvalidNamespaceError = TypedError({
-  type: 'debug-logtron.invalid-argument.namespace',
-  message: 'Unexpected characters in the `namespace` arg.\n' +
-        'Expected the namespace to be a bare word but instead ' +
-            'found {badChar} character.\n' +
-        'SUGGESTED FIX: Use just alphanum in the namespace.\n',
-  badChar: null,
-  reason: null,
-  namespace: null
-})
+
+class InvalidNamespaceError extends Error {
+  constructor (namespace, badChar, reason) {
+    super(
+`Unexpected characters in the '${namespace}' arg.
+Expected the namespace to be a bare word but instead found ${badChar} character.
+SUGGESTED FIX: Use just alphanum in the namespace.
+`)
+
+    this.type = 'testing-logger.invalid-argument.namespace'
+    this.name = 'InvalidNamespaceError'
+    this.badChar = badChar
+    this.reason = reason
+    this.namespace = namespace
+  }
+}
+
 const COLOR_MAP = {
   fatal: 'bgRed',
   error: 'bgRed',
@@ -43,12 +49,11 @@ class TestingLogger {
       const hasHypen = namespace.indexOf('-') >= 0
       const hasSpace = namespace.indexOf(' ') >= 0
 
-      throw InvalidNamespaceError({
-        namespace: namespace,
-        badChar: hasHypen ? '-' : hasSpace ? 'space' : 'bad',
-        reason: hasHypen ? 'hypen'
-          : hasSpace ? 'space' : 'unknown'
-      })
+      throw new InvalidNamespaceError(
+        namespace,
+        hasHypen ? '-' : hasSpace ? 'space' : 'bad',
+        hasHypen ? 'hypen' : hasSpace ? 'space' : 'unknown'
+      )
     }
 
     this.console = opts.console || globalConsole
