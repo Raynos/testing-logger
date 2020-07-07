@@ -28,8 +28,15 @@ const COLOR_MAP = {
   trace: 'bgCyan'
 }
 
-/* eslint-disable complexity */
-class DebugLogBackend {
+/**
+ * TestingLogger implements the actual utility.
+ *
+ *  - Support whitelist() & popLogs() & isEmpty()
+ *  - Print logs to stdout if not whitelisted.
+ *  - support verbose & NODE_DEBUG
+ *  - fail hard on error() & fatal()
+ */
+class TestingLogger {
   constructor (namespace, opts) {
     const isValid = validNamespaceRegex.test(namespace)
     if (!isValid) {
@@ -166,4 +173,4 @@ class DebugLogBackend {
   }
 }
 
-module.exports = DebugLogBackend
+module.exports = TestingLogger

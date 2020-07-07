@@ -7,10 +7,10 @@ const TermColor = require('term-color')
 
 TermColor.enabled = false
 
-const DebugLogtron = require('../debug-logtron.js')
+const TestingLogger = require('../logger.js')
 
-test('DebugLogtron is a function', function t (assert) {
-  assert.equal(typeof DebugLogtron, 'function')
+test('TestingLogger is a function', function t (assert) {
+  assert.equal(typeof TestingLogger, 'function')
   assert.end()
 })
 
@@ -46,13 +46,13 @@ test('can log async', function t (assert) {
 test('logger throws with bad namespace', function t (assert) {
   let logger
   assert.throws(function throwIt () {
-    logger = new DebugLogtron('bad name')
+    logger = new TestingLogger('bad name')
   }, /found space character/)
   assert.throws(function throwIt () {
-    logger = new DebugLogtron('bad-name')
+    logger = new TestingLogger('bad-name')
   }, /found - character/)
   assert.throws(function throwIt () {
-    logger = new DebugLogtron('bad#name')
+    logger = new TestingLogger('bad#name')
   }, /found bad character/)
   assert.equal(logger, undefined)
 
@@ -62,7 +62,7 @@ test('logger throws with bad namespace', function t (assert) {
 test('logger defaults opts', function t (assert) {
   let logger
   assert.doesNotThrow(function noThrow () {
-    logger = new DebugLogtron('somenamespace')
+    logger = new TestingLogger('somenamespace')
   })
   assert.ok(logger)
 
@@ -144,7 +144,7 @@ test('LogMessage to buffer', function t (assert) {
   const hostname = os.hostname()
 
   const time = (new Date()).toISOString()
-  const logMessage = DebugLogtron.makeMessage(20, 'hi', null, time)
+  const logMessage = TestingLogger.makeMessage(20, 'hi', null, time)
 
   const buf = logMessage.toBuffer()
 
@@ -197,7 +197,7 @@ test('logger respects color option', function t (assert) {
 
 test('always prints error/fatal', function t (assert) {
   let lines = []
-  const logger = new DebugLogtron('wat', {
+  const logger = new TestingLogger('wat', {
     console: {
       error: function log (x) {
         lines.push(x)
@@ -222,7 +222,7 @@ test('always prints error/fatal', function t (assert) {
 
 test('prints warn/info by default', function t (assert) {
   let lines = []
-  const logger = new DebugLogtron('wat', {
+  const logger = new TestingLogger('wat', {
     console: {
       error: function log (x) {
         lines.push(x)
@@ -245,7 +245,7 @@ test('prints warn/info by default', function t (assert) {
 
 test('prints warn/info if enabled', function t (assert) {
   let lines = []
-  const logger = new DebugLogtron('wat', {
+  const logger = new TestingLogger('wat', {
     console: {
       error: function log (x) {
         lines.push(x)
@@ -269,7 +269,7 @@ test('prints warn/info if enabled', function t (assert) {
 
 test('does not prints warn/info if disabled', function t (assert) {
   let lines = []
-  const logger = new DebugLogtron('wat', {
+  const logger = new TestingLogger('wat', {
     console: {
       error: function log (x) {
         lines.push(x)
@@ -291,7 +291,7 @@ test('does not prints warn/info if disabled', function t (assert) {
 
 test('prints debug/access/trace if NODE_DEBUG', function t (assert) {
   const lines = []
-  const logger = new DebugLogtron('wat', {
+  const logger = new TestingLogger('wat', {
     console: {
       error: function log (x) {
         lines.push(x)
@@ -324,7 +324,7 @@ test('prints debug/access/trace if NODE_DEBUG', function t (assert) {
 
 test('prints debug/access/trace if verbose', function t (assert) {
   const lines = []
-  const logger = new DebugLogtron('wat', {
+  const logger = new TestingLogger('wat', {
     console: {
       error: function log (x) {
         lines.push(x)
@@ -356,7 +356,7 @@ test('prints debug/access/trace if verbose', function t (assert) {
 test('writes to assert comment', function t (assert) {
   const lines = []
   const comments = []
-  const logger = new DebugLogtron('wat', {
+  const logger = new TestingLogger('wat', {
     console: {
       error: function log (x) {
         lines.push(x)
@@ -430,9 +430,9 @@ test('can unwhitelist errors', function t (assert) {
 
 function allocLogger (opts) {
   opts = opts || {}
-  const logger = new DebugLogtron('debuglogtrontestcode', {
+  const logger = new TestingLogger('TestingLoggertestcode', {
     env: {
-      NODE_DEBUG: 'debuglogtrontestcode'
+      NODE_DEBUG: 'TestingLoggertestcode'
     },
     console: {
       error: function logStatement (msg) {

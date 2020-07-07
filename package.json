@@ -5,7 +5,7 @@
   "keywords": [],
   "author": "Raynos <raynos2@gmail.com>",
   "repository": "git://github.com/Raynos/debug-logtron.git",
-  "main": "debug-logtron.js",
+  "main": "logger.js",
   "homepage": "https://github.com/Raynos/debug-logtron",
   "bugs": {
     "url": "https://github.com/Raynos/debug-logtron/issues",

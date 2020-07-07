@@ -6,7 +6,7 @@ const process = require('process')
 const os = require('os')
 const Buffer = require('buffer').Buffer
 
-const DebugLogBackend = require('./debug-log-backend.js')
+const TestingLogger = require('./testing-logger.js')
 
 const LEVELS_BY_NAME = {
   trace: 10,
@@ -27,11 +27,20 @@ const LEVELS_BY_VALUE = {
   60: 'fatal'
 }
 
-class DebugLogtron {
+/**
+ * Implement boilerplate to be a logger, aka info, warn, error
+ * etc.
+ *
+ * Make sure to forward logs to `this._backend.write()` and
+ * forward other useful methods.
+ *
+ * Actual TestingLogger is implemented in `./testing-logger.js`
+ */
+class LoggerInterface {
   constructor (namespace, opts = {}) {
     this.name = namespace
 
-    this._backend = new DebugLogBackend(this.name, opts)
+    this._backend = new TestingLogger(this.name, opts)
   }
 
   static makeMessage (level, msg, meta, time) {
@@ -153,6 +162,6 @@ class LogData {
   }
 }
 
-module.exports = DebugLogtron
+module.exports = LoggerInterface
 
 function noop () {}
