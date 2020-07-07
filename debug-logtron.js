@@ -30,7 +30,7 @@ class DebugLogtron {
   constructor (namespace, opts = {}) {
     this.name = namespace
 
-    this._backend = DebugLogBackend(this.name, opts)
+    this._backend = new DebugLogBackend(this.name, opts)
     this._stream = this._backend.createStream()
   }
 

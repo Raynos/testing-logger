@@ -27,179 +27,153 @@ const COLOR_MAP = {
   trace: 'bgCyan'
 }
 
-module.exports = DebugLogBackend
-
 /* eslint-disable complexity */
-function DebugLogBackend (namespace, opts) {
-  if (!(this instanceof DebugLogBackend)) {
-    return new DebugLogBackend(namespace, opts)
-  }
+class DebugLogBackend {
+  constructor (namespace, opts) {
+    const isValid = validNamespaceRegex.test(namespace)
+    if (!isValid) {
+      const hasHypen = namespace.indexOf('-') >= 0
+      const hasSpace = namespace.indexOf(' ') >= 0
 
-  const self = this
-
-  const isValid = validNamespaceRegex.test(namespace)
-  if (!isValid) {
-    const hasHypen = namespace.indexOf('-') >= 0
-    const hasSpace = namespace.indexOf(' ') >= 0
-
-    throw InvalidNamespaceError({
-      namespace: namespace,
-      badChar: hasHypen ? '-' : hasSpace ? 'space' : 'bad',
-      reason: hasHypen ? 'hypen'
-        : hasSpace ? 'space' : 'unknown'
-    })
-  }
-
-  self.console = opts.console || globalConsole
-  self.assert = opts.assert
-  self.colors = typeof opts.colors === 'boolean'
-    ? opts.colors : true
-    /* eslint no-process-env: 0 */
-  self.env = opts.env || process.env
-  self.namespace = namespace.toUpperCase()
-
-  self.whitelists = {
-    fatal: {},
-    error: {},
-    warn: {},
-    access: {},
-    info: {},
-    debug: {},
-    trace: {}
-  }
-  self.records = []
-
-  self.recordsByMessage = {}
-  self.logged = 0
-
-  const debugEnviron = self.env.NODE_DEBUG || ''
-  const regex = new RegExp('\\b' + self.namespace + '\\b', 'i')
-
-  self.enabled = typeof opts.enabled === 'boolean'
-    ? opts.enabled : true
-  self.verbose = opts.verbose || regex.test(debugEnviron)
-  self.trace = typeof opts.trace === 'boolean'
-    ? opts.trace : (self.verbose && !!self.env.TRACE)
-
-  if (self.verbose) {
-    self.enabled = true
-  }
-}
-
-DebugLogBackend.prototype.whitelist = function whitelist (level, msg) {
-  const self = this
-
-  self.whitelists[level][msg] = true
-}
-
-DebugLogBackend.prototype.unwhitelist = function unwhitelist (level, msg) {
-  const self = this
-
-  self.whitelists[level][msg] = false
-}
-
-DebugLogBackend.prototype.items = function items (level, msg) {
-  const self = this
-
-  return self.records.slice()
-}
-
-DebugLogBackend.prototype.popLogs = function popLogs (message) {
-  const self = this
-
-  const records = self.recordsByMessage[message]
-  delete self.recordsByMessage[message]
-
-  return records || []
-}
-
-DebugLogBackend.prototype.isEmpty = function isEmpty () {
-  const self = this
-
-  return self.logged === 0 &&
-        Object.keys(self.recordsByMessage).length === 0
-}
-
-DebugLogBackend.prototype.createStream = function createStream () {
-  const self = this
-
-  return DebugLogStream(self.namespace, self)
-}
-
-function DebugLogStream (namespace, backend) {
-  if (!(this instanceof DebugLogStream)) {
-    return new DebugLogStream(namespace, backend)
-  }
-
-  const self = this
-
-  self.namespace = namespace
-  self.backend = backend
-}
-
-DebugLogStream.prototype.write = function write (logMessage, cb) {
-  /* eslint complexity: [2, 15] */
-  const self = this
-
-  const logRecord = logMessage.toLogRecord()
-  const levelName = logRecord.levelName
-
-  const whitelist = self.backend.whitelists[levelName]
-  if (whitelist[logRecord.msg]) {
-    if (!self.backend.recordsByMessage[logRecord.msg]) {
-      self.backend.recordsByMessage[logRecord.msg] = []
+      throw InvalidNamespaceError({
+        namespace: namespace,
+        badChar: hasHypen ? '-' : hasSpace ? 'space' : 'bad',
+        reason: hasHypen ? 'hypen'
+          : hasSpace ? 'space' : 'unknown'
+      })
     }
-    self.backend.recordsByMessage[logRecord.msg].push(logRecord)
-    self.backend.records.push(logRecord)
+
+    this.console = opts.console || globalConsole
+    this.assert = opts.assert
+    this.colors = typeof opts.colors === 'boolean'
+      ? opts.colors : true
+    /* eslint no-process-env: 0 */
+    this.env = opts.env || process.env
+    this.namespace = namespace.toUpperCase()
+
+    this.whitelists = {
+      fatal: {},
+      error: {},
+      warn: {},
+      access: {},
+      info: {},
+      debug: {},
+      trace: {}
+    }
+    this.records = []
+
+    this.recordsByMessage = {}
+    this.logged = 0
+
+    const debugEnviron = this.env.NODE_DEBUG || ''
+    const regex = new RegExp('\\b' + this.namespace + '\\b', 'i')
+
+    this.enabled = typeof opts.enabled === 'boolean'
+      ? opts.enabled : true
+    this.verbose = opts.verbose || regex.test(debugEnviron)
+    this.trace = typeof opts.trace === 'boolean'
+      ? opts.trace : (this.verbose && !!this.env.TRACE)
+
+    if (this.verbose) {
+      this.enabled = true
+    }
+  }
+
+  whitelist (level, msg) {
+    this.whitelists[level][msg] = true
+  }
+
+  unwhitelist (level, msg) {
+    this.whitelists[level][msg] = false
+  }
+
+  items () {
+    return this.records.slice()
+  }
+
+  popLogs (message) {
+    const records = this.recordsByMessage[message]
+    delete this.recordsByMessage[message]
+
+    return records || []
+  }
+
+  isEmpty () {
+    return this.logged === 0 &&
+      Object.keys(this.recordsByMessage).length === 0
+  }
+
+  createStream () {
+    return new DebugLogStream(this.namespace, this)
+  }
+}
+
+class DebugLogStream {
+  constructor (namespace, backend) {
+    this.namespace = namespace
+    this.backend = backend
+  }
+
+  write (logMessage, cb) {
+    const logRecord = logMessage.toLogRecord()
+    const levelName = logRecord.levelName
+
+    const whitelist = this.backend.whitelists[levelName]
+    if (whitelist[logRecord.msg]) {
+      if (!this.backend.recordsByMessage[logRecord.msg]) {
+        this.backend.recordsByMessage[logRecord.msg] = []
+      }
+      this.backend.recordsByMessage[logRecord.msg].push(logRecord)
+      this.backend.records.push(logRecord)
+
+      /* istanbul ignore else */
+      if (cb) {
+        cb()
+      }
+      return
+    }
+
+    if (
+      (levelName === 'fatal' || levelName === 'error') ||
+        (this.backend.enabled &&
+            (levelName === 'warn' || levelName === 'info')) ||
+        (this.backend.verbose &&
+            (levelName === 'access' || levelName === 'debug')) ||
+        (this.backend.trace && levelName === 'trace')
+    ) {
+      this.backend.logged++
+
+      const msg = this.formatMessage(logRecord)
+      if (this.backend.assert) {
+        this.backend.assert.comment(msg)
+      } else {
+        this.backend.console.error(msg)
+      }
+    }
+
+    if (levelName === 'fatal' || levelName === 'error') {
+      throw new Error(logRecord.msg)
+    }
 
     /* istanbul ignore else */
     if (cb) {
       cb()
     }
-    return
   }
 
-  if (
-    (levelName === 'fatal' || levelName === 'error') ||
-        (self.backend.enabled &&
-            (levelName === 'warn' || levelName === 'info')) ||
-        (self.backend.verbose &&
-            (levelName === 'access' || levelName === 'debug')) ||
-        (self.backend.trace && levelName === 'trace')
-  ) {
-    self.backend.logged++
+  formatMessage (logRecord) {
+    let prefix = this.namespace + ' ' +
+      logRecord.levelName.toUpperCase() + ':'
+    const color = COLOR_MAP[logRecord.levelName]
 
-    const msg = self.formatMessage(logRecord)
-    if (self.backend.assert) {
-      self.backend.assert.comment(msg)
-    } else {
-      self.backend.console.error(msg)
+    if (this.backend.colors) {
+      prefix = TermColor[color](prefix)
+      prefix = TermColor.bold(prefix)
     }
-  }
 
-  if (levelName === 'fatal' || levelName === 'error') {
-    throw new Error(logRecord.msg)
-  }
-
-  /* istanbul ignore else */
-  if (cb) {
-    cb()
+    return prefix + ' ' + logRecord.msg + ' ~ ' +
+      inspect(logRecord.meta)
   }
 }
 
-DebugLogStream.prototype.formatMessage =
-function formatMessage (logRecord) {
-  const self = this
-
-  let prefix = self.namespace + ' ' +
-        logRecord.levelName.toUpperCase() + ':'
-  const color = COLOR_MAP[logRecord.levelName]
-
-  if (self.backend.colors) {
-    prefix = TermColor[color](prefix)
-    prefix = TermColor.bold(prefix)
-  }
-
-  return prefix + ' ' + logRecord.msg + ' ~ ' +
-        inspect(logRecord.meta)
-}
+module.exports = DebugLogBackend
