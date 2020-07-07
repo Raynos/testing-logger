@@ -1,3 +1,4 @@
+// @ts-check
 'use strict'
 
 const inspect = require('util').inspect
@@ -103,28 +104,17 @@ class DebugLogBackend {
       Object.keys(this.recordsByMessage).length === 0
   }
 
-  createStream () {
-    return new DebugLogStream(this.namespace, this)
-  }
-}
-
-class DebugLogStream {
-  constructor (namespace, backend) {
-    this.namespace = namespace
-    this.backend = backend
-  }
-
   write (logMessage, cb) {
     const logRecord = logMessage.toLogRecord()
     const levelName = logRecord.levelName
 
-    const whitelist = this.backend.whitelists[levelName]
+    const whitelist = this.whitelists[levelName]
     if (whitelist[logRecord.msg]) {
-      if (!this.backend.recordsByMessage[logRecord.msg]) {
-        this.backend.recordsByMessage[logRecord.msg] = []
+      if (!this.recordsByMessage[logRecord.msg]) {
+        this.recordsByMessage[logRecord.msg] = []
       }
-      this.backend.recordsByMessage[logRecord.msg].push(logRecord)
-      this.backend.records.push(logRecord)
+      this.recordsByMessage[logRecord.msg].push(logRecord)
+      this.records.push(logRecord)
 
       /* istanbul ignore else */
       if (cb) {
@@ -135,19 +125,19 @@ class DebugLogStream {
 
     if (
       (levelName === 'fatal' || levelName === 'error') ||
-        (this.backend.enabled &&
+        (this.enabled &&
             (levelName === 'warn' || levelName === 'info')) ||
-        (this.backend.verbose &&
+        (this.verbose &&
             (levelName === 'access' || levelName === 'debug')) ||
-        (this.backend.trace && levelName === 'trace')
+        (this.trace && levelName === 'trace')
     ) {
-      this.backend.logged++
+      this.logged++
 
       const msg = this.formatMessage(logRecord)
-      if (this.backend.assert) {
-        this.backend.assert.comment(msg)
+      if (this.assert) {
+        this.assert.comment(msg)
       } else {
-        this.backend.console.error(msg)
+        this.console.error(msg)
       }
     }
 
@@ -166,7 +156,7 @@ class DebugLogStream {
       logRecord.levelName.toUpperCase() + ':'
     const color = COLOR_MAP[logRecord.levelName]
 
-    if (this.backend.colors) {
+    if (this.colors) {
       prefix = TermColor[color](prefix)
       prefix = TermColor.bold(prefix)
     }

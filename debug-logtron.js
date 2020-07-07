@@ -1,3 +1,4 @@
+// @ts-check
 'use strict'
 
 const assert = require('assert')
@@ -31,7 +32,6 @@ class DebugLogtron {
     this.name = namespace
 
     this._backend = new DebugLogBackend(this.name, opts)
-    this._stream = this._backend.createStream()
   }
 
   static makeMessage (level, msg, meta, time) {
@@ -48,7 +48,7 @@ class DebugLogtron {
     const logMessage = new LogMessage(level, msg, meta)
     LogMessage.checkValidMessage(logMessage)
 
-    this._stream.write(logMessage, cb)
+    this._backend.write(logMessage, cb)
   }
 
   trace (msg, meta, cb) {
