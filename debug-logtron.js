@@ -42,7 +42,7 @@ class DebugLogtron {
 
   _log (level, msg, meta, cb = noop) {
     const logMessage = new LogMessage(level, msg, meta)
-    isValidMessage(logMessage)
+    LogMessage.checkValidMessage(logMessage)
 
     this._stream.write(logMessage, cb)
   }
@@ -76,74 +76,80 @@ class DebugLogtron {
   }
 }
 
+class LogMessage {
+  constructor (level, msg, meta, time) {
+    this.level = level
+    this.levelName = LEVELS_BY_VALUE[level]
+    this.msg = msg
+
+    this.meta = (meta === null || meta === undefined) ? null : meta
+
+    this._time = time
+    this._jsonLogRecord = null
+    this._buffer = null
+  }
+
+  static checkValidMessage (logRecord) {
+    assert(typeof logRecord.level === 'number',
+      'level must be a number')
+    assert(typeof logRecord.msg === 'string',
+      'msg must be a string')
+
+    assert(logRecord.meta === null ||
+          typeof logRecord.meta === 'object',
+    'meta must be an object')
+  }
+
+  toLogRecord () {
+    if (!this._jsonLogRecord) {
+      this._jsonLogRecord = new JSONLogRecord(
+        this.level, this.msg, this.meta, this._time)
+    }
+
+    return this._jsonLogRecord
+  }
+
+  toBuffer () {
+    if (!this._buffer) {
+      const logRecord = this.toLogRecord()
+
+      const jsonStr = JSON.stringify(logRecord._logData)
+      this._buffer = Buffer.from(jsonStr)
+    }
+
+    return this._buffer
+  }
+}
+
+/* JSONLogRecord. The same interface as bunyan on the wire */
+class JSONLogRecord {
+  constructor (level, msg, meta, time) {
+    this._logData = new LogData(level, msg, meta, time)
+
+    this.msg = msg
+    this.levelName = LEVELS_BY_VALUE[level]
+    this.meta = meta
+  }
+}
+
+class LogData {
+  constructor (level, msg, meta, time) {
+    this.name = null
+    this.hostname = os.hostname()
+    this.pid = process.pid
+    this.component = null
+    this.level = LEVELS_BY_VALUE[level]
+    this.msg = msg
+    this.time = time || (new Date()).toISOString()
+    this.src = null
+    this.v = 0
+
+    // Non standard
+    this.fields = meta
+  }
+}
+
 DebugLogtron.LogMessage = LogMessage
 module.exports = DebugLogtron
 
 function noop () {}
-
-function LogMessage (level, msg, meta, time) {
-  this.level = level
-  this.levelName = LEVELS_BY_VALUE[level]
-  this.msg = msg
-
-  this.meta = (meta === null || meta === undefined) ? null : meta
-
-  this._time = time
-  this._jsonLogRecord = null
-  this._buffer = null
-}
-
-LogMessage.prototype.toLogRecord = function toLogRecord () {
-  if (!this._jsonLogRecord) {
-    this._jsonLogRecord = new JSONLogRecord(
-      this.level, this.msg, this.meta, this._time)
-  }
-
-  return this._jsonLogRecord
-}
-
-LogMessage.prototype.toBuffer = function toBuffer () {
-  if (!this._buffer) {
-    const logRecord = this.toLogRecord()
-
-    const jsonStr = JSON.stringify(logRecord._logData)
-    this._buffer = Buffer.from(jsonStr)
-  }
-
-  return this._buffer
-}
-
-/* JSONLogRecord. The same interface as bunyan on the wire */
-function JSONLogRecord (level, msg, meta, time) {
-  this._logData = new LogData(level, msg, meta, time)
-
-  this.msg = msg
-  this.levelName = LEVELS_BY_VALUE[level]
-  this.meta = meta
-}
-
-function LogData (level, msg, meta, time) {
-  this.name = null
-  this.hostname = os.hostname()
-  this.pid = process.pid
-  this.component = null
-  this.level = LEVELS_BY_VALUE[level]
-  this.msg = msg
-  this.time = time || (new Date()).toISOString()
-  this.src = null
-  this.v = 0
-
-  // Non standard
-  this.fields = meta
-}
-
-function isValidMessage (logRecord) {
-  assert(typeof logRecord.level === 'number',
-    'level must be a number')
-  assert(typeof logRecord.msg === 'string',
-    'msg must be a string')
-
-  assert(logRecord.meta === null ||
-        typeof logRecord.meta === 'object',
-  'meta must be an object')
-}
