@@ -1,25 +1,21 @@
 {
-  "name": "debug-logtron",
+  "name": "testing-logger",
   "version": "5.2.0",
-  "description": "A debug logger with a logtron interface.",
+  "description": "A logger specifically for use in test suites / harnesses.",
   "keywords": [],
   "author": "Raynos <raynos2@gmail.com>",
-  "repository": "git://github.com/Raynos/debug-logtron.git",
+  "repository": "git://github.com/Raynos/testing-logger.git",
   "main": "logger.js",
-  "homepage": "https://github.com/Raynos/debug-logtron",
+  "homepage": "https://github.com/Raynos/testing-logger",
   "bugs": {
-    "url": "https://github.com/Raynos/debug-logtron/issues",
+    "url": "https://github.com/Raynos/testing-logger/issues",
     "email": "raynos2@gmail.com"
   },
   "contributors": [
-    {
-      "name": "Raynos"
-    }
+    { "name": "Raynos" }
   ],
   "standard": {
-    "ignore": [
-      "supports-color.js"
-    ]
+    "ignore": [ "supports-color.js" ]
   },
   "dependencies": {},
   "binDependencies": {
@@ -36,7 +32,7 @@
   "licenses": [
     {
       "type": "MIT",
-      "url": "http://github.com/Raynos/debug-logtron/raw/master/LICENSE"
+      "url": "http://github.com/Raynos/testing-logger/raw/master/LICENSE"
     }
   ],
   "scripts": {
@@ -52,9 +48,7 @@
   "engine": {
     "node": ">= 0.8.x"
   },
-  "pre-commit": [
-    "test"
-  ],
+  "pre-commit": [],
   "pre-commit.silent": true,
   "ngen-version": "5.0.0"
 }
