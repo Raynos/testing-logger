@@ -1,14 +1,14 @@
 'use strict'
 
-var collectParallel = require('collect-parallel/array')
-var assert = require('assert')
-var process = require('process/')
-var os = require('os')
-var Buffer = require('buffer').Buffer
+const collectParallel = require('collect-parallel/array')
+const assert = require('assert')
+const process = require('process/')
+const os = require('os')
+const Buffer = require('buffer').Buffer
 
-var DebugLogBackend = require('./debug-log-backend.js')
+const DebugLogBackend = require('./debug-log-backend.js')
 
-var LEVELS_BY_NAME = {
+const LEVELS_BY_NAME = {
   trace: 10,
   debug: 20,
   info: 30,
@@ -18,7 +18,7 @@ var LEVELS_BY_NAME = {
   fatal: 60
 }
 
-var LEVELS_BY_VALUE = {
+const LEVELS_BY_VALUE = {
   10: 'trace',
   20: 'debug',
   30: 'info',
@@ -65,7 +65,7 @@ DebugLogtron.prototype.isEmpty = function isEmpty () {
 }
 
 DebugLogtron.prototype._log = function _log (level, msg, meta, cb) {
-  var logMessage = new LogMessage(level, msg, meta)
+  const logMessage = new LogMessage(level, msg, meta)
   isValidMessage(logMessage)
 
   collectParallel(this._streams, writeMessage, cb || noop)
@@ -128,9 +128,9 @@ LogMessage.prototype.toLogRecord = function toLogRecord () {
 
 LogMessage.prototype.toBuffer = function toBuffer () {
   if (!this._buffer) {
-    var logRecord = this.toLogRecord()
+    const logRecord = this.toLogRecord()
 
-    var jsonStr = JSON.stringify(logRecord._logData)
+    const jsonStr = JSON.stringify(logRecord._logData)
     this._buffer = Buffer.from(jsonStr)
   }
 
