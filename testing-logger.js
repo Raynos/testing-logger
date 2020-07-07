@@ -4,7 +4,8 @@
 const inspect = require('util').inspect
 const process = require('process')
 const globalConsole = require('console')
-const TermColor = require('term-color')
+
+const SUPPORTS_COLORS = require('./supports-color.js')
 
 const validNamespaceRegex = /^[a-zA-Z0-9]+$/
 
@@ -25,13 +26,13 @@ SUGGESTED FIX: Use just alphanum in the namespace.
 }
 
 const COLOR_MAP = {
-  fatal: 'bgRed',
-  error: 'bgRed',
-  warn: 'bgYellow',
-  access: 'bgGreen',
-  info: 'bgGreen',
-  debug: 'bgBlue',
-  trace: 'bgCyan'
+  fatal: bgRed,
+  error: bgRed,
+  warn: bgYellow,
+  access: bgGreen,
+  info: bgGreen,
+  debug: bgBlue,
+  trace: bgCyan
 }
 
 /**
@@ -166,11 +167,11 @@ class TestingLogger {
   formatMessage (logRecord) {
     let prefix = this.namespace + ' ' +
       logRecord.levelName.toUpperCase() + ':'
-    const color = COLOR_MAP[logRecord.levelName]
+    const colorFn = COLOR_MAP[logRecord.levelName]
 
-    if (this.colors) {
-      prefix = TermColor[color](prefix)
-      prefix = TermColor.bold(prefix)
+    if (this.colors && TestingLogger.COLORS_ENABLED) {
+      prefix = colorFn(prefix)
+      prefix = bold(prefix)
     }
 
     return prefix + ' ' + logRecord.msg + ' ~ ' +
@@ -178,4 +179,30 @@ class TestingLogger {
   }
 }
 
+TestingLogger.COLORS_ENABLED = SUPPORTS_COLORS
+
 module.exports = TestingLogger
+
+function bold (text) {
+  return '\u001b[1m' + text + '\u001b[22m'
+}
+
+function bgRed (text) {
+  return '\u001b[41m' + text + '\u001b[49m'
+}
+
+function bgYellow (text) {
+  return '\u001b[43m' + text + '\u001b[49m'
+}
+
+function bgGreen (text) {
+  return '\u001b[42m' + text + '\u001b[49m'
+}
+
+function bgBlue (text) {
+  return '\u001b[44m' + text + '\u001b[49m'
+}
+
+function bgCyan (text) {
+  return '\u001b[46m' + text + '\u001b[49m'
+}

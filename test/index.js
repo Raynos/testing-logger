@@ -1,16 +1,17 @@
 'use strict'
 
-const test = require('tape')
+const test = require('@pre-bundled/tape')
 const process = require('process')
 const os = require('os')
-const TermColor = require('term-color')
 
-TermColor.enabled = false
+const Logger = require('../logger.js')
+const _TestingLogger = require('../testing-logger')
 
-const TestingLogger = require('../logger.js')
+_TestingLogger.COLORS_ENABLED = false
 
 test('TestingLogger is a function', function t (assert) {
-  assert.equal(typeof TestingLogger, 'function')
+  assert.equal(typeof Logger, 'function')
+  assert.equal(typeof _TestingLogger, 'function')
   assert.end()
 })
 
@@ -46,13 +47,13 @@ test('can log async', function t (assert) {
 test('logger throws with bad namespace', function t (assert) {
   let logger
   assert.throws(function throwIt () {
-    logger = new TestingLogger('bad name')
+    logger = new Logger('bad name')
   }, /found space character/)
   assert.throws(function throwIt () {
-    logger = new TestingLogger('bad-name')
+    logger = new Logger('bad-name')
   }, /found - character/)
   assert.throws(function throwIt () {
-    logger = new TestingLogger('bad#name')
+    logger = new Logger('bad#name')
   }, /found bad character/)
   assert.equal(logger, undefined)
 
@@ -62,7 +63,7 @@ test('logger throws with bad namespace', function t (assert) {
 test('logger defaults opts', function t (assert) {
   let logger
   assert.doesNotThrow(function noThrow () {
-    logger = new TestingLogger('somenamespace')
+    logger = new Logger('somenamespace')
   })
   assert.ok(logger)
 
@@ -144,7 +145,7 @@ test('LogMessage to buffer', function t (assert) {
   const hostname = os.hostname()
 
   const time = (new Date()).toISOString()
-  const logMessage = TestingLogger.makeMessage(20, 'hi', null, time)
+  const logMessage = Logger.makeMessage(20, 'hi', null, time)
 
   const buf = logMessage.toBuffer()
 
@@ -172,7 +173,7 @@ test('LogMessage to buffer', function t (assert) {
 })
 
 test('logger respects color option', function t (assert) {
-  TermColor.enabled = true
+  _TestingLogger.COLORS_ENABLED = true
   const logger1 = allocLogger({
     colors: false
   })
@@ -191,13 +192,13 @@ test('logger respects color option', function t (assert) {
     line2.indexOf('INFO:\u001b[49m\u001b[22m hi ~ null') >= 0
   )
 
-  TermColor.enabled = false
+  _TestingLogger.COLORS_ENABLED = false
   assert.end()
 })
 
 test('always prints error/fatal', function t (assert) {
   let lines = []
-  const logger = new TestingLogger('wat', {
+  const logger = new Logger('wat', {
     console: {
       error: function log (x) {
         lines.push(x)
@@ -222,7 +223,7 @@ test('always prints error/fatal', function t (assert) {
 
 test('prints warn/info by default', function t (assert) {
   let lines = []
-  const logger = new TestingLogger('wat', {
+  const logger = new Logger('wat', {
     console: {
       error: function log (x) {
         lines.push(x)
@@ -245,7 +246,7 @@ test('prints warn/info by default', function t (assert) {
 
 test('prints warn/info if enabled', function t (assert) {
   let lines = []
-  const logger = new TestingLogger('wat', {
+  const logger = new Logger('wat', {
     console: {
       error: function log (x) {
         lines.push(x)
@@ -269,7 +270,7 @@ test('prints warn/info if enabled', function t (assert) {
 
 test('does not prints warn/info if disabled', function t (assert) {
   let lines = []
-  const logger = new TestingLogger('wat', {
+  const logger = new Logger('wat', {
     console: {
       error: function log (x) {
         lines.push(x)
@@ -291,7 +292,7 @@ test('does not prints warn/info if disabled', function t (assert) {
 
 test('prints debug/access/trace if NODE_DEBUG', function t (assert) {
   const lines = []
-  const logger = new TestingLogger('wat', {
+  const logger = new Logger('wat', {
     console: {
       error: function log (x) {
         lines.push(x)
@@ -324,7 +325,7 @@ test('prints debug/access/trace if NODE_DEBUG', function t (assert) {
 
 test('prints debug/access/trace if verbose', function t (assert) {
   const lines = []
-  const logger = new TestingLogger('wat', {
+  const logger = new Logger('wat', {
     console: {
       error: function log (x) {
         lines.push(x)
@@ -356,7 +357,7 @@ test('prints debug/access/trace if verbose', function t (assert) {
 test('writes to assert comment', function t (assert) {
   const lines = []
   const comments = []
-  const logger = new TestingLogger('wat', {
+  const logger = new Logger('wat', {
     console: {
       error: function log (x) {
         lines.push(x)
@@ -430,7 +431,7 @@ test('can unwhitelist errors', function t (assert) {
 
 function allocLogger (opts) {
   opts = opts || {}
-  const logger = new TestingLogger('TestingLoggertestcode', {
+  const logger = new Logger('TestingLoggertestcode', {
     env: {
       NODE_DEBUG: 'TestingLoggertestcode'
     },
