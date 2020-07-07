@@ -1,13 +1,13 @@
 'use strict'
 
-var inspect = require('util').inspect
-var process = require('process')
-var globalConsole = require('console')
-var TypedError = require('error/typed')
-var TermColor = require('term-color')
+const inspect = require('util').inspect
+const process = require('process')
+const globalConsole = require('console')
+const TypedError = require('error/typed')
+const TermColor = require('term-color')
 
-var validNamespaceRegex = /^[a-zA-Z0-9]+$/
-var InvalidNamespaceError = TypedError({
+const validNamespaceRegex = /^[a-zA-Z0-9]+$/
+const InvalidNamespaceError = TypedError({
   type: 'debug-logtron.invalid-argument.namespace',
   message: 'Unexpected characters in the `namespace` arg.\n' +
         'Expected the namespace to be a bare word but instead ' +
@@ -17,7 +17,7 @@ var InvalidNamespaceError = TypedError({
   reason: null,
   namespace: null
 })
-var COLOR_MAP = {
+const COLOR_MAP = {
   fatal: 'bgRed',
   error: 'bgRed',
   warn: 'bgYellow',
@@ -35,12 +35,12 @@ function DebugLogBackend (namespace, opts) {
     return new DebugLogBackend(namespace, opts)
   }
 
-  var self = this
+  const self = this
 
-  var isValid = validNamespaceRegex.test(namespace)
+  const isValid = validNamespaceRegex.test(namespace)
   if (!isValid) {
-    var hasHypen = namespace.indexOf('-') >= 0
-    var hasSpace = namespace.indexOf(' ') >= 0
+    const hasHypen = namespace.indexOf('-') >= 0
+    const hasSpace = namespace.indexOf(' ') >= 0
 
     throw InvalidNamespaceError({
       namespace: namespace,
@@ -72,8 +72,8 @@ function DebugLogBackend (namespace, opts) {
   self.recordsByMessage = {}
   self.logged = 0
 
-  var debugEnviron = self.env.NODE_DEBUG || ''
-  var regex = new RegExp('\\b' + self.namespace + '\\b', 'i')
+  const debugEnviron = self.env.NODE_DEBUG || ''
+  const regex = new RegExp('\\b' + self.namespace + '\\b', 'i')
 
   self.enabled = typeof opts.enabled === 'boolean'
     ? opts.enabled : true
@@ -87,41 +87,41 @@ function DebugLogBackend (namespace, opts) {
 }
 
 DebugLogBackend.prototype.whitelist = function whitelist (level, msg) {
-  var self = this
+  const self = this
 
   self.whitelists[level][msg] = true
 }
 
 DebugLogBackend.prototype.unwhitelist = function unwhitelist (level, msg) {
-  var self = this
+  const self = this
 
   self.whitelists[level][msg] = false
 }
 
 DebugLogBackend.prototype.items = function items (level, msg) {
-  var self = this
+  const self = this
 
   return self.records.slice()
 }
 
 DebugLogBackend.prototype.popLogs = function popLogs (message) {
-  var self = this
+  const self = this
 
-  var records = self.recordsByMessage[message]
+  const records = self.recordsByMessage[message]
   delete self.recordsByMessage[message]
 
   return records || []
 }
 
 DebugLogBackend.prototype.isEmpty = function isEmpty () {
-  var self = this
+  const self = this
 
   return self.logged === 0 &&
         Object.keys(self.recordsByMessage).length === 0
 }
 
 DebugLogBackend.prototype.createStream = function createStream () {
-  var self = this
+  const self = this
 
   return DebugLogStream(self.namespace, self)
 }
@@ -131,7 +131,7 @@ function DebugLogStream (namespace, backend) {
     return new DebugLogStream(namespace, backend)
   }
 
-  var self = this
+  const self = this
 
   self.namespace = namespace
   self.backend = backend
@@ -139,12 +139,12 @@ function DebugLogStream (namespace, backend) {
 
 DebugLogStream.prototype.write = function write (logMessage, cb) {
   /* eslint complexity: [2, 15] */
-  var self = this
+  const self = this
 
-  var logRecord = logMessage.toLogRecord()
-  var levelName = logRecord.levelName
+  const logRecord = logMessage.toLogRecord()
+  const levelName = logRecord.levelName
 
-  var whitelist = self.backend.whitelists[levelName]
+  const whitelist = self.backend.whitelists[levelName]
   if (whitelist[logRecord.msg]) {
     if (!self.backend.recordsByMessage[logRecord.msg]) {
       self.backend.recordsByMessage[logRecord.msg] = []
@@ -169,7 +169,7 @@ DebugLogStream.prototype.write = function write (logMessage, cb) {
   ) {
     self.backend.logged++
 
-    var msg = self.formatMessage(logRecord)
+    const msg = self.formatMessage(logRecord)
     if (self.backend.assert) {
       self.backend.assert.comment(msg)
     } else {
@@ -189,11 +189,11 @@ DebugLogStream.prototype.write = function write (logMessage, cb) {
 
 DebugLogStream.prototype.formatMessage =
 function formatMessage (logRecord) {
-  var self = this
+  const self = this
 
-  var prefix = self.namespace + ' ' +
+  let prefix = self.namespace + ' ' +
         logRecord.levelName.toUpperCase() + ':'
-  var color = COLOR_MAP[logRecord.levelName]
+  const color = COLOR_MAP[logRecord.levelName]
 
   if (self.backend.colors) {
     prefix = TermColor[color](prefix)
