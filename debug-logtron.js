@@ -2,8 +2,8 @@
 
 var util = require('util')
 
-var BaseLogtron = require('./lib/base-logtron.js')
-var DebugLogBackend = require('./backends/debug-log-backend.js')
+var BaseLogtron = require('./base-logtron.js')
+var DebugLogBackend = require('./debug-log-backend.js')
 
 module.exports = DebugLogtron
 

@@ -7,8 +7,8 @@ var TermColor = require('term-color')
 
 TermColor.enabled = false
 
-var DebugLogtron = require('../index.js')
-var LogMessage = require('../lib/log-message.js')
+var DebugLogtron = require('../debug-logtron.js')
+var LogMessage = require('../log-message.js')
 
 test('DebugLogtron is a function', function t (assert) {
   assert.equal(typeof DebugLogtron, 'function')
