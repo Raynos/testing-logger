@@ -1,14 +1,13 @@
 'use strict'
 
-var test = require('tape')
-var process = require('process/')
-var os = require('os')
-var TermColor = require('term-color')
+const test = require('tape')
+const process = require('process')
+const os = require('os')
+const TermColor = require('term-color')
 
 TermColor.enabled = false
 
-var DebugLogtron = require('../debug-logtron.js')
-var LogMessage = DebugLogtron.LogMessage
+const DebugLogtron = require('../debug-logtron.js')
 
 test('DebugLogtron is a function', function t (assert) {
   assert.equal(typeof DebugLogtron, 'function')
@@ -16,20 +15,20 @@ test('DebugLogtron is a function', function t (assert) {
 })
 
 test('can create logger', function t (assert) {
-  var logger = allocLogger()
+  const logger = allocLogger()
 
   logger.debug('hi')
 
   assert.equal(logger.lines.length, 1)
 
-  var line = logger.lines[0]
+  const line = logger.lines[0]
   assert.ok(line.msg.indexOf('DEBUG: hi ~ null') >= 0)
 
   assert.end()
 })
 
 test('can log async', function t (assert) {
-  var logger = allocLogger()
+  const logger = allocLogger()
 
   logger.debug('oh hi', {}, onLogged)
 
@@ -37,7 +36,7 @@ test('can log async', function t (assert) {
     assert.ifError(err)
     assert.equal(logger.lines.length, 1)
 
-    var line = logger.lines[0]
+    const line = logger.lines[0]
     assert.ok(line.msg.indexOf('DEBUG: oh hi ~ {}') >= 0)
 
     assert.end()
@@ -72,7 +71,7 @@ test('logger defaults opts', function t (assert) {
 
 test('logger levels', function t (assert) {
   /* eslint max-statements: 0 */
-  var logger = allocLogger()
+  const logger = allocLogger()
 
   logger.trace('trace')
   logger.debug('debug')
@@ -82,19 +81,19 @@ test('logger levels', function t (assert) {
 
   assert.equal(logger.lines.length, 5)
 
-  var line = logger.lines[0]
+  const line = logger.lines[0]
   assert.ok(line.msg.indexOf('TRACE: trace ~ null') >= 0)
 
-  var line2 = logger.lines[1]
+  const line2 = logger.lines[1]
   assert.ok(line2.msg.indexOf('DEBUG: debug ~ null') >= 0)
 
-  var line3 = logger.lines[2]
+  const line3 = logger.lines[2]
   assert.ok(line3.msg.indexOf('INFO: info ~ null') >= 0)
 
-  var line4 = logger.lines[3]
+  const line4 = logger.lines[3]
   assert.ok(line4.msg.indexOf('ACCESS: access ~ null') >= 0)
 
-  var line5 = logger.lines[4]
+  const line5 = logger.lines[4]
   assert.ok(line5.msg.indexOf('WARN: warn ~ null') >= 0)
 
   assert.throws(function throwIt () {
@@ -104,10 +103,10 @@ test('logger levels', function t (assert) {
     logger.fatal('fatal')
   }, 'fatal')
 
-  var line6 = logger.lines[5]
+  const line6 = logger.lines[5]
   assert.ok(line6.msg.indexOf('ERROR: error ~ null') >= 0)
 
-  var line7 = logger.lines[6]
+  const line7 = logger.lines[6]
   assert.ok(line7.msg.indexOf('FATAL: fatal ~ null') >= 0)
 
   assert.end()
@@ -115,7 +114,7 @@ test('logger levels', function t (assert) {
 
 test('fails with string meta', function t (assert) {
   assert.throws(function throwIt () {
-    var logger = allocLogger()
+    const logger = allocLogger()
 
     logger.info('hi', 'string meta')
   }, /meta must be an object/)
@@ -124,7 +123,7 @@ test('fails with string meta', function t (assert) {
 })
 
 test('serialize meta', function t (assert) {
-  var logger = allocLogger()
+  const logger = allocLogger()
 
   logger.info('hello', {
     complex: {
@@ -133,7 +132,7 @@ test('serialize meta', function t (assert) {
   })
 
   assert.equal(logger.lines.length, 1)
-  var line = logger.lines[0]
+  const line = logger.lines[0]
 
   assert.ok(line.msg.indexOf('INFO: hello ~ ' +
         '{ complex: { nested: true, foo: \'bar\' } }') >= 0)
@@ -142,12 +141,12 @@ test('serialize meta', function t (assert) {
 })
 
 test('LogMessage to buffer', function t (assert) {
-  var hostname = os.hostname()
+  const hostname = os.hostname()
 
-  var time = (new Date()).toISOString()
-  var logMessage = new LogMessage(20, 'hi', null, time)
+  const time = (new Date()).toISOString()
+  const logMessage = DebugLogtron.makeMessage(20, 'hi', null, time)
 
-  var buf = logMessage.toBuffer()
+  const buf = logMessage.toBuffer()
 
   assert.equal(String(buf),
     '{"name":null,' +
@@ -162,11 +161,11 @@ test('LogMessage to buffer', function t (assert) {
         '"fields":null}'
   )
 
-  var buf2 = logMessage.toBuffer()
+  const buf2 = logMessage.toBuffer()
   assert.equal(buf, buf2)
 
-  var logRecord = logMessage.toLogRecord()
-  var logRecord2 = logMessage.toLogRecord()
+  const logRecord = logMessage.toLogRecord()
+  const logRecord2 = logMessage.toLogRecord()
   assert.equal(logRecord, logRecord2)
 
   assert.end()
@@ -174,20 +173,20 @@ test('LogMessage to buffer', function t (assert) {
 
 test('logger respects color option', function t (assert) {
   TermColor.enabled = true
-  var logger1 = allocLogger({
+  const logger1 = allocLogger({
     colors: false
   })
-  var logger2 = allocLogger({
+  const logger2 = allocLogger({
     colors: true
   })
 
   logger1.info('hi')
   logger2.info('hi')
 
-  var line1 = logger1.lines[0].msg
+  const line1 = logger1.lines[0].msg
   assert.ok(line1.indexOf('INFO: hi ~ null') >= 0)
 
-  var line2 = logger2.lines[0].msg
+  const line2 = logger2.lines[0].msg
   assert.ok(
     line2.indexOf('INFO:\u001b[49m\u001b[22m hi ~ null') >= 0
   )
@@ -197,8 +196,8 @@ test('logger respects color option', function t (assert) {
 })
 
 test('always prints error/fatal', function t (assert) {
-  var lines = []
-  var logger = new DebugLogtron('wat', {
+  let lines = []
+  const logger = new DebugLogtron('wat', {
     console: {
       error: function log (x) {
         lines.push(x)
@@ -211,7 +210,7 @@ test('always prints error/fatal', function t (assert) {
     logger.error('hi')
   }, 'hi')
   assert.equal(lines.length, 1)
-  var line = lines[0]
+  const line = lines[0]
   assert.ok(line.indexOf('ERROR: hi ~ null') >= 0)
 
   lines = []
@@ -222,8 +221,8 @@ test('always prints error/fatal', function t (assert) {
 })
 
 test('prints warn/info by default', function t (assert) {
-  var lines = []
-  var logger = new DebugLogtron('wat', {
+  let lines = []
+  const logger = new DebugLogtron('wat', {
     console: {
       error: function log (x) {
         lines.push(x)
@@ -245,8 +244,8 @@ test('prints warn/info by default', function t (assert) {
 })
 
 test('prints warn/info if enabled', function t (assert) {
-  var lines = []
-  var logger = new DebugLogtron('wat', {
+  let lines = []
+  const logger = new DebugLogtron('wat', {
     console: {
       error: function log (x) {
         lines.push(x)
@@ -269,8 +268,8 @@ test('prints warn/info if enabled', function t (assert) {
 })
 
 test('does not prints warn/info if disabled', function t (assert) {
-  var lines = []
-  var logger = new DebugLogtron('wat', {
+  let lines = []
+  const logger = new DebugLogtron('wat', {
     console: {
       error: function log (x) {
         lines.push(x)
@@ -291,8 +290,8 @@ test('does not prints warn/info if disabled', function t (assert) {
 })
 
 test('prints debug/access/trace if NODE_DEBUG', function t (assert) {
-  var lines = []
-  var logger = new DebugLogtron('wat', {
+  const lines = []
+  const logger = new DebugLogtron('wat', {
     console: {
       error: function log (x) {
         lines.push(x)
@@ -324,8 +323,8 @@ test('prints debug/access/trace if NODE_DEBUG', function t (assert) {
 })
 
 test('prints debug/access/trace if verbose', function t (assert) {
-  var lines = []
-  var logger = new DebugLogtron('wat', {
+  const lines = []
+  const logger = new DebugLogtron('wat', {
     console: {
       error: function log (x) {
         lines.push(x)
@@ -355,9 +354,9 @@ test('prints debug/access/trace if verbose', function t (assert) {
 })
 
 test('writes to assert comment', function t (assert) {
-  var lines = []
-  var comments = []
-  var logger = new DebugLogtron('wat', {
+  const lines = []
+  const comments = []
+  const logger = new DebugLogtron('wat', {
     console: {
       error: function log (x) {
         lines.push(x)
@@ -382,7 +381,7 @@ test('writes to assert comment', function t (assert) {
 })
 
 test('can whitelist errors', function t (assert) {
-  var logger = allocLogger()
+  const logger = allocLogger()
 
   assert.throws(function throwIt () {
     logger.error('oh hi')
@@ -407,7 +406,7 @@ test('can whitelist errors', function t (assert) {
 })
 
 test('can unwhitelist errors', function t (assert) {
-  var logger = allocLogger()
+  const logger = allocLogger()
 
   assert.throws(function throwIt () {
     logger.error('oh hi')
@@ -431,7 +430,7 @@ test('can unwhitelist errors', function t (assert) {
 
 function allocLogger (opts) {
   opts = opts || {}
-  var logger = new DebugLogtron('debuglogtrontestcode', {
+  const logger = new DebugLogtron('debuglogtrontestcode', {
     env: {
       NODE_DEBUG: 'debuglogtrontestcode'
     },

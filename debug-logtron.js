@@ -34,6 +34,10 @@ class DebugLogtron {
     this._stream = this._backend.createStream()
   }
 
+  static makeMessage (level, msg, meta, time) {
+    return new LogMessage(level, msg, meta, time)
+  }
+
   whitelist (level, msg) { this._backend.whitelist(level, msg) }
   unwhitelist (level, msg) { this._backend.unwhitelist(level, msg) }
   items () { return this._backend.items() }
@@ -149,7 +153,6 @@ class LogData {
   }
 }
 
-DebugLogtron.LogMessage = LogMessage
 module.exports = DebugLogtron
 
 function noop () {}
