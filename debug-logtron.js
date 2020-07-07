@@ -1,8 +1,7 @@
 'use strict'
 
-const collectParallel = require('collect-parallel/array')
 const assert = require('assert')
-const process = require('process/')
+const process = require('process')
 const os = require('os')
 const Buffer = require('buffer').Buffer
 
@@ -17,7 +16,6 @@ const LEVELS_BY_NAME = {
   error: 50,
   fatal: 60
 }
-
 const LEVELS_BY_VALUE = {
   10: 'trace',
   20: 'debug',
@@ -28,80 +26,58 @@ const LEVELS_BY_VALUE = {
   60: 'fatal'
 }
 
+class DebugLogtron {
+  constructor (namespace, opts = {}) {
+    this.name = namespace
+
+    this._backend = DebugLogBackend(this.name, opts)
+    this._stream = this._backend.createStream()
+  }
+
+  whitelist (level, msg) { this._backend.whitelist(level, msg) }
+  unwhitelist (level, msg) { this._backend.unwhitelist(level, msg) }
+  items () { return this._backend.items() }
+  popLogs (message) { return this._backend.popLogs(message) }
+  isEmpty () { return this._backend.isEmpty() }
+
+  _log (level, msg, meta, cb = noop) {
+    const logMessage = new LogMessage(level, msg, meta)
+    isValidMessage(logMessage)
+
+    this._stream.write(logMessage, cb)
+  }
+
+  trace (msg, meta, cb) {
+    this._log(LEVELS_BY_NAME.trace, msg, meta, cb)
+  }
+
+  debug (msg, meta, cb) {
+    this._log(LEVELS_BY_NAME.debug, msg, meta, cb)
+  }
+
+  info (msg, meta, cb) {
+    this._log(LEVELS_BY_NAME.info, msg, meta, cb)
+  }
+
+  access (msg, meta, cb) {
+    this._log(LEVELS_BY_NAME.access, msg, meta, cb)
+  }
+
+  warn (msg, meta, cb) {
+    this._log(LEVELS_BY_NAME.warn, msg, meta, cb)
+  }
+
+  error (msg, meta, cb) {
+    this._log(LEVELS_BY_NAME.error, msg, meta, cb)
+  }
+
+  fatal (msg, meta, cb) {
+    this._log(LEVELS_BY_NAME.fatal, msg, meta, cb)
+  }
+}
+
 DebugLogtron.LogMessage = LogMessage
 module.exports = DebugLogtron
-
-function DebugLogtron (namespace, opts) {
-  if (!(this instanceof DebugLogtron)) {
-    return new DebugLogtron(namespace, opts)
-  }
-
-  opts = opts || {}
-
-  this.name = namespace
-
-  this._backend = DebugLogBackend(this.name, opts)
-  this._streams = [this._backend.createStream()]
-}
-
-DebugLogtron.prototype.whitelist = function whitelist (level, msg) {
-  this._backend.whitelist(level, msg)
-}
-
-DebugLogtron.prototype.unwhitelist = function unwhitelist (level, msg) {
-  this._backend.unwhitelist(level, msg)
-}
-
-DebugLogtron.prototype.items = function items () {
-  return this._backend.items()
-}
-
-DebugLogtron.prototype.popLogs = function popLogs (message) {
-  return this._backend.popLogs(message)
-}
-
-DebugLogtron.prototype.isEmpty = function isEmpty () {
-  return this._backend.isEmpty()
-}
-
-DebugLogtron.prototype._log = function _log (level, msg, meta, cb) {
-  const logMessage = new LogMessage(level, msg, meta)
-  isValidMessage(logMessage)
-
-  collectParallel(this._streams, writeMessage, cb || noop)
-
-  function writeMessage (stream, i, callback) {
-    stream.write(logMessage, callback)
-  }
-}
-
-DebugLogtron.prototype.trace = function trace (msg, meta, cb) {
-  this._log(LEVELS_BY_NAME.trace, msg, meta, cb)
-}
-
-DebugLogtron.prototype.debug = function debug (msg, meta, cb) {
-  this._log(LEVELS_BY_NAME.debug, msg, meta, cb)
-}
-
-DebugLogtron.prototype.info = function info (msg, meta, cb) {
-  this._log(LEVELS_BY_NAME.info, msg, meta, cb)
-}
-
-DebugLogtron.prototype.access = function access (msg, meta, cb) {
-  this._log(LEVELS_BY_NAME.access, msg, meta, cb)
-}
-
-DebugLogtron.prototype.warn = function warn (msg, meta, cb) {
-  this._log(LEVELS_BY_NAME.warn, msg, meta, cb)
-}
-
-DebugLogtron.prototype.error = function error (msg, meta, cb) {
-  this._log(LEVELS_BY_NAME.error, msg, meta, cb)
-}
-
-DebugLogtron.prototype.fatal = function fatal (msg, meta, cb) {
-  this._log(LEVELS_BY_NAME.fatal, msg, meta, cb)
-}
 
 function noop () {}
 

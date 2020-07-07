@@ -45,23 +45,27 @@ test('can log async', function t (assert) {
 })
 
 test('logger throws with bad namespace', function t (assert) {
+  let logger
   assert.throws(function throwIt () {
-    DebugLogtron('bad name')
+    logger = new DebugLogtron('bad name')
   }, /found space character/)
   assert.throws(function throwIt () {
-    DebugLogtron('bad-name')
+    logger = new DebugLogtron('bad-name')
   }, /found - character/)
   assert.throws(function throwIt () {
-    DebugLogtron('bad#name')
+    logger = new DebugLogtron('bad#name')
   }, /found bad character/)
+  assert.equal(logger, undefined)
 
   assert.end()
 })
 
 test('logger defaults opts', function t (assert) {
+  let logger
   assert.doesNotThrow(function noThrow () {
-    DebugLogtron('somenamespace')
+    logger = new DebugLogtron('somenamespace')
   })
+  assert.ok(logger)
 
   assert.end()
 })
@@ -194,7 +198,7 @@ test('logger respects color option', function t (assert) {
 
 test('always prints error/fatal', function t (assert) {
   var lines = []
-  var logger = DebugLogtron('wat', {
+  var logger = new DebugLogtron('wat', {
     console: {
       error: function log (x) {
         lines.push(x)
@@ -219,7 +223,7 @@ test('always prints error/fatal', function t (assert) {
 
 test('prints warn/info by default', function t (assert) {
   var lines = []
-  var logger = DebugLogtron('wat', {
+  var logger = new DebugLogtron('wat', {
     console: {
       error: function log (x) {
         lines.push(x)
@@ -242,7 +246,7 @@ test('prints warn/info by default', function t (assert) {
 
 test('prints warn/info if enabled', function t (assert) {
   var lines = []
-  var logger = DebugLogtron('wat', {
+  var logger = new DebugLogtron('wat', {
     console: {
       error: function log (x) {
         lines.push(x)
@@ -266,7 +270,7 @@ test('prints warn/info if enabled', function t (assert) {
 
 test('does not prints warn/info if disabled', function t (assert) {
   var lines = []
-  var logger = DebugLogtron('wat', {
+  var logger = new DebugLogtron('wat', {
     console: {
       error: function log (x) {
         lines.push(x)
@@ -288,7 +292,7 @@ test('does not prints warn/info if disabled', function t (assert) {
 
 test('prints debug/access/trace if NODE_DEBUG', function t (assert) {
   var lines = []
-  var logger = DebugLogtron('wat', {
+  var logger = new DebugLogtron('wat', {
     console: {
       error: function log (x) {
         lines.push(x)
@@ -321,7 +325,7 @@ test('prints debug/access/trace if NODE_DEBUG', function t (assert) {
 
 test('prints debug/access/trace if verbose', function t (assert) {
   var lines = []
-  var logger = DebugLogtron('wat', {
+  var logger = new DebugLogtron('wat', {
     console: {
       error: function log (x) {
         lines.push(x)
@@ -353,7 +357,7 @@ test('prints debug/access/trace if verbose', function t (assert) {
 test('writes to assert comment', function t (assert) {
   var lines = []
   var comments = []
-  var logger = DebugLogtron('wat', {
+  var logger = new DebugLogtron('wat', {
     console: {
       error: function log (x) {
         lines.push(x)
@@ -427,7 +431,7 @@ test('can unwhitelist errors', function t (assert) {
 
 function allocLogger (opts) {
   opts = opts || {}
-  var logger = DebugLogtron('debuglogtrontestcode', {
+  var logger = new DebugLogtron('debuglogtrontestcode', {
     env: {
       NODE_DEBUG: 'debuglogtrontestcode'
     },
