@@ -45,7 +45,7 @@
     "unit-test": "node test/index.js",
     "jshint": "npr standard -v",
     "cover": "npr istanbul cover --report html --print detail -- test/index.js && npm run check-cover -s",
-    "check-cover": "npr istanbul check-coverage --branches=100 --lines=100 --functions=100",
+    "check-cover": "npr istanbul check-coverage --branches=90 --lines=90 --functions=80",
     "view-cover": "npr opn ./coverage/index.html",
     "travis": "npm run cover -s && npr istanbul report lcov && ((cat coverage/lcov.info | coveralls) || exit 0)"
   },
