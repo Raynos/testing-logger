@@ -1,6 +1,6 @@
 {
   "name": "testing-logger",
-  "version": "5.2.0",
+  "version": "6.0.0",
   "description": "A logger specifically for use in test suites / harnesses.",
   "keywords": [],
   "author": "Raynos <raynos2@gmail.com>",
@@ -12,10 +12,14 @@
     "email": "raynos2@gmail.com"
   },
   "contributors": [
-    { "name": "Raynos" }
+    {
+      "name": "Raynos"
+    }
   ],
   "standard": {
-    "ignore": [ "supports-color.js" ]
+    "ignore": [
+      "supports-color.js"
+    ]
   },
   "dependencies": {},
   "binDependencies": {
